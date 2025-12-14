@@ -5,7 +5,7 @@ export default class Enemy {
         this.width = 100;
         this.height = 100;
 
-        this.speed = 2;
+        this.speed = 1.95;
         this.jumpSpeed = 4;       // horizontal boost during jump
         this.vx = 0;
         this.vy = 0;

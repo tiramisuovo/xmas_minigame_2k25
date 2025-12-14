@@ -1,7 +1,7 @@
 import Player from "./Player.js";
 import Bullet from "./bullet.js";
 import Enemy from "./enemy.js";
-import { rooms } from "./rooms.js";
+import { buildRooms } from "./rooms.js";
 import Gift from "./Gift.js";
 import Boss from "./Boss.js";
 import Snowball from "./Snowball.js";
@@ -52,13 +52,6 @@ function updateSnow() {
 createSnowflakes();
 updateSnow();
 
-// Resize handler
-window.addEventListener("resize", () => {
-    snowCanvas.width = window.innerWidth;
-    snowCanvas.height = window.innerHeight;
-    createSnowflakes();
-});
-
 // ===============================
 // TYPEWRITER EFFECT
 function typeWriter(element, text, speed = 40) {
@@ -108,17 +101,16 @@ const nameInput = document.getElementById("playerName");
 
 const beginGameBtn = document.getElementById("beginGameBtn");
 
+let rawName = "";
 let playerName = "";
 let gameStarted = false;
-
-
 
 // -------------------------------
 // STEP 1 — ENTER NAME
 // -------------------------------
 startButton.addEventListener("click", () => {
-    playerName = nameInput.value.trim().toLowerCase();
-
+    rawName = nameInput.value.trim().toLowerCase();
+    playerName = rawName[0]+rawName[1] || ""; // first two letters
     if (!playerName) return;
 
     // Hide the loading screen
@@ -129,25 +121,22 @@ startButton.addEventListener("click", () => {
 
     let inGameName = "";
     // Custom story message based on name
-    if (playerName === "jenny") {
+    if (playerName === "je") {
         inGameName = "tiramisu 🍰";
     }
-    else if (playerName === "santa") {
-        inGameName = "mrs. claus 🎅";
-    }
-    else if (playerName === "crystal") {
+    else if (playerName === "cr") {
         inGameName = "the BEST NEUROSURGEON 🧠";
     }
-    else if (playerName === "ann") {
+    else if (playerName === "an") {
         inGameName = "red panda cuddler 🧡";
     }
-    else if (playerName === "shukriya") {
+    else if (playerName === "sh") {
         inGameName = "iced capp queen 🧋";
     }
-    else if (playerName === "yifei") {
+    else if (playerName === "yi") {
         inGameName = "Princess of Tomatoes 🍅";
     }
-    else if (playerName === "selina") {
+    else if (playerName === "se") {
         inGameName = "bestie forever ✨";
     }
     else {
@@ -177,7 +166,16 @@ startButton.addEventListener("click", () => {
         document.getElementById("storyLine3").style.opacity = 1;
     }, 5000);
 
-    // ⭐ Reveal Begin Button After All Text is Done
+    if (playerName === "cr" || playerName === "an" || playerName === "sh" || playerName === "se") {
+        setTimeout(() => {
+            typeWriter(
+                document.getElementById("storyLine4"),
+                "Just for you: press 1 anytime to toggle assist mode & don't tell anyone shushhhhh",
+                60
+            );
+            document.getElementById("storyLine4").style.opacity = 1;
+        }, 7500)};
+
     setTimeout(() => {
         const btn = document.getElementById("beginGameBtn");
         btn.style.opacity = 1;
@@ -256,6 +254,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let rooms = buildRooms(canvas.width, canvas.height);
 
 // ---------------------------
 // GLOBAL STATE
@@ -303,29 +302,97 @@ const bubble = document.getElementById("catBubble");
 let catClicks = 0;
 
 const postCallEligibleNames = [
-    "crystal",
-    "ann",
-    "shukriya",
+    "cr",
+    "an",
+    "sh",
 ];
 
 const bulletSkins = {
-    "yifei": "assets/tomato.png",
+    "yi": "assets/tomato.png",
     "default": "assets/snowflake.png"
 };
 
-const invertControlPlayer = "yifei"; 
+const invertControlPlayer = "yi"; 
 let invertControls = false;
 let invertTriggered = false;
 
 let respectText = "";
 let respectTextVisible = false;
 
-const invinciblePlayer = "crystal";
+const invinciblePlayers = ["cr", "an", "sh", "se"];
 let invincibleMode = false;
 
 let assistText = "";
 let assistTextVisible = false;
 window.invincibleMode = invincibleMode;
+
+function applyRoomLayout(room) {
+    platforms = room.platforms.map(p => ({ ...p }));
+    crumblePlatforms = room.crumblePlatforms
+        ? room.crumblePlatforms.map(c => ({ ...c }))
+        : [];
+
+    platforms.push(
+        { x: -50, y: 0, width: 50, height: canvas.height, invisible: true },
+        { x: canvas.width, y: 0, width: 50, height: canvas.height, invisible: true }
+    );
+}
+
+function scaleActiveEntities(scaleX, scaleY) {
+    if (player) {
+        player.x *= scaleX;
+        player.y *= scaleY;
+    }
+
+    enemies.forEach(e => {
+        e.x *= scaleX;
+        e.y *= scaleY;
+    });
+
+    bullets.forEach(b => {
+        b.x *= scaleX;
+        b.y *= scaleY;
+    });
+
+    gifts.forEach(g => {
+        g.x *= scaleX;
+        g.y *= scaleY;
+    });
+
+    snowballs.forEach(sb => {
+        sb.x *= scaleX;
+        sb.y *= scaleY;
+    });
+
+    if (boss) {
+        boss.x *= scaleX;
+        boss.y *= scaleY;
+    }
+}
+
+function handleResize() {
+    const prevWidth = canvas.width;
+    const prevHeight = canvas.height;
+
+    snowCanvas.width = window.innerWidth;
+    snowCanvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const scaleX = prevWidth ? canvas.width / prevWidth : 1;
+    const scaleY = prevHeight ? canvas.height / prevHeight : 1;
+
+    rooms = buildRooms(canvas.width, canvas.height);
+
+    if (gameStarted && !gameEnded) {
+        scaleActiveEntities(scaleX, scaleY);
+        applyRoomLayout(rooms[currentRoomIndex]);
+    }
+
+    createSnowflakes();
+}
+
+window.addEventListener("resize", handleResize);
 
 // ---------------------------
 // INPUT
@@ -347,10 +414,11 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keydown", (e) => {
     if (
         e.key === "1" &&
-        playerName === invinciblePlayer
+        invinciblePlayers.includes(playerName)
     ) {
         invincibleMode = !invincibleMode;
         window.invincibleMode = invincibleMode;
+
         showAssistText(
             invincibleMode
                 ? "assist mode enabled."
@@ -429,31 +497,15 @@ function loadRoom(index) {
         triggerRespectText();
     }
 
-    // deep copy platforms
-    platforms = room.platforms.map(p => ({
-        x: p.x,
-        y: p.y,
-        width: p.width,
-        height: p.height
-    }));
-
-    // add invisible walls
-    platforms.push(
-        { x: -50, y: 0, width: 50, height: canvas.height, invisible: true },
-        { x: canvas.width, y: 0, width: 50, height: canvas.height, invisible: true }
-    );
+    applyRoomLayout(room);
 
     // clone enemies
     enemies = room.enemies.map(e => new Enemy(e.x, e.y));
 
-    crumblePlatforms = room.crumblePlatforms
-        ? room.crumblePlatforms.map(c => ({ ...c }))
-        : [];
-
     bullets = [];
 
     // boss
-    if (room.boss) {
+    if (room.boss && room.boss.x !== undefined) {
         boss = new Boss(room.boss.x, room.boss.y);
     } else {
         boss = null;
@@ -463,8 +515,6 @@ function loadRoom(index) {
 // ---------------------------
 // ROOM EXIT CHECK
 // ---------------------------
-const isBossRoom = !!rooms[currentRoomIndex].boss;
-
 function checkExit() {
     const room = rooms[currentRoomIndex];
     const door = room.exitDoor;
@@ -513,7 +563,7 @@ cat.addEventListener("click", () => {
     let message = catDialog[catClicks];
 
     // SPECIAL CASE
-    if (playerName === "yifei" && catClicks === 17) {
+    if (playerName === "yi" && catClicks === 17) {
         message = "senpai";
     }
 
@@ -955,4 +1005,3 @@ function endGame() {
 
 //loadRoom(0);
 //gameLoop();
-

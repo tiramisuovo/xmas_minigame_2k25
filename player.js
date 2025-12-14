@@ -8,9 +8,9 @@ export default class Player {
 
         this.vx = 0
         this.vy = 0
-        this.speed = 4
-        this.gravity = 0.6
-        this.jumpStrength = -15
+        this.speed = 4.6
+        this.gravity = 0.57
+        this.jumpStrength = -16.5
         this.canJump = true
         this.facing = 1; // 1 for right, -1 for left
 
@@ -20,11 +20,13 @@ export default class Player {
         this.shootOffsetX = 50;
         this.shootOffsetY =  20;  // move bullet downward
 
-        this.maxHP = 3;
-        this.hp = 3;
+        this.maxHP = 5;
+        this.hp = 5;
         this.isInvincible = false;
         this.invincibilityDuration = 1500; // ms
         this.knockback = 10;
+        this.coyoteTimer = 0;
+        this.coyoteTimeMax = 180; // ms (use 300–420 for assist later)
     }
 
     moveLeft(){
@@ -42,9 +44,10 @@ export default class Player {
     }
 
     jump(){
-        if(this.canJump){
-            this.vy = this.jumpStrength
+        if (this.canJump || this.coyoteTimer > 0){
+            this.vy = this.jumpStrength;
             this.canJump = false;
+            this.coyoteTimer = 0;
         }
     }
 
@@ -134,10 +137,22 @@ export default class Player {
                 }
             }
         }
+
+        // Update coyote timer
+        if (this.isInvincible) {
+            this.coyoteTimeMax = 500;
+            }
+        
+        if (this.canJump) {
+            this.coyoteTimer = this.coyoteTimeMax;
+        } else {
+            this.coyoteTimer -= 16; // assuming ~60fps
+        }
     }
 
     takeDamage(fromEnemy) {
         if (window.invincibleMode) return; // cannot take damage during i-frames
+        if (this.isInvincible) return;     // <- skip during i-frames
         if (this.hp <= 0) return;
 
         this.hp -= 1;

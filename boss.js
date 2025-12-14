@@ -1,17 +1,18 @@
 export default class Boss {
-    constructor(x, y) {
+    constructor(x, y, maxY = Infinity) {
         this.x = x;
         this.y = y;
 
         this.width = 180;
         this.height = 180;
+        this.maxY = maxY
 
-        this.maxHP = 20;
-        this.hp = 20;
+        this.maxHP = 6;
+        this.hp = 6;
 
         this.vx = 0;
         this.vy = 0;
-        this.speed = 2;
+        this.speed = 1.5;
         this.gravity = 0.6;
 
         this.jumpStrength = -18;
@@ -23,11 +24,11 @@ export default class Boss {
         this.facing = 1;
 
         // Snowball attack timers
-        this.shootCooldown = 2000;  
+        this.shootCooldown = 4000;  
         this.lastShot = 0;
 
         // For summoning minions (optional)
-        this.summonCooldown = 8000;
+        this.summonCooldown = 9000;
         this.lastSummon = 0;
 
         this.alive = true;
@@ -52,6 +53,7 @@ export default class Boss {
         let nextY = this.y + this.vy;
         let landed = false;
 
+
         // Platform landing
         for (let p of platforms) {
             const withinX =
@@ -71,8 +73,8 @@ export default class Boss {
         }
 
         // Occasional jumping to pressure player
-        if (this.canJump && Math.random() < 0.01) {
-            this.vy = this.jumpStrength;
+        if (this.canJump && this.y >= this.maxY && Math.random() < 0.01) {
+            this.vy = this.jumpStrength;  // Let it jump if it's on the bottom platforms
             this.canJump = false;
         }
 
