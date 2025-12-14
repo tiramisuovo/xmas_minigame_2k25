@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+
+    <title>Christmas MiniGame 2k25</title>
+</head>
+
+<body>
+<canvas id="snowCanvas"></canvas>
+
+<!-- MUSIC DEACTIVATED
+<audio id="bgm" src="assets/music.mp3" loop></audio>
+-->
+
+<!-- Mute button -->
+<div id="muteBtn">🔊</div>
+ 
+<!-- Loading Screen -->
+<div id="loadingScreen" class="centered-screen">
+    <h1>Santa has outsourced this year's chaos to me AHAHAHA.</h1>
+    <h1>Traveler, tell me thy name?</h1>
+
+    <input id="playerName" placeholder="Enter name..." />
+    <button id="startBtn">Start</button>
+</div>
+
+<!-- Story Screen -->
+<div id="storyScreen" class="centered-screen" style="display:none;">
+    <src>
+        <img src="assets/cat_cage.png" alt="Cat Image" width="200" />
+    </src>
+    <h1 id="storyText"></h1>
+    <h1 id="storyLine2">The cat has been kidnapped, apparently.</h1>
+    <h1 id="storyLine3">Please save her...and stay alive...maybe :)</h1>
+    <button id="beginGameBtn">Begin Journey</button>
+</div>
+
+<!-- Post-call Screen -->
+<div id="postCallScreen" class="centered-screen" style="display:none;">
+    <h1>Quick question, traveler.</h1>
+    <h1>Are you post-call?</h1>
+
+    <div style="margin-top:20px;">
+        <button id="postCallYes">Yes</button>
+        <button id="postCallNo">No</button>
+    </div>
+
+    <h1 id="easyModeQuestion" style="display:none; margin-top:40px;">
+        Would you like to have the easy mode?
+    </h1>
+
+    <div id="easyModeButtons" style="display:none; margin-top:20px;">
+        <button class="noBtn">No</button>
+        <button class="noBtn">No</button>
+    </div>
+
+    <h1 id="finalResponse" style="display:none; margin-top:40px;">
+        ok as you wish
+    </h1>
+
+    <button id="continueGameBtn" style="display:none; margin-top:40px;">
+        Begin suffering
+    </button>
+</div>
+
+<!-- Ending Screen -->
+<div id="endingScreen" class="centered-screen" style="display:none;">
+    <h1>You have saved the cat.</h1>
+    <h1>The cat says thank you.</h1>
+    <h1>Merry Christmas and happy new year!</h1>
+    <h1>Here is your renewal to another year's chaos with me AHAHAHA</h1>
+
+    <div id="catContainer">
+        <img
+            id="endingCat"
+            src="assets/cat.png"
+            alt="Cat Image"
+            width="200"
+        />
+        <div id="catBubble"></div>
+    </div>
+</div>
+<!-- Only ONE canvas -->
+<canvas id="game" style="display:none;"></canvas>
+
+<style>
+.centered-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: "Playfair Display", Georgia, serif;
+    text-align: center;
+    z-index: 999;     /* ensure always on top */
+}
+
+#playerName {
+    width: 280px;
+    padding: 10px;
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+#storyText, #storyLine2, #storyLine3 {
+    display: block;
+    width: 100%;
+    text-align: center;
+    white-space: pre-wrap; /* <-- FIX */
+    word-break: keep-all;  /* <-- prevents weird breaking */
+    line-height: 1.3;      /* optional, makes it pretty */
+}
+
+#storyLine2, #storyLine3 {
+    opacity: 0;
+}
+
+#beginGameBtn {
+    opacity: 0;
+    pointer-events: none;   /* cannot click until revealed */
+    transition: opacity 0.8s ease;
+}
+
+#startBtn, #beginGameBtn {
+    padding: 10px 25px;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#snowCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;   /* allows clicking through */
+    width: 100%;
+    height: 100%;
+    z-index: 1000;          /* on top of everything */
+}
+
+#catContainer {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    pointer-events: auto;
+}
+
+#endingCat {
+    cursor: pointer;
+}
+
+#catBubble {
+    position: absolute;
+    top: -40px;        /* above cat */
+    left: -20px;       /* to the left */
+    background: white;
+    color: black;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 20px;
+    font-family: "Playfair Display", Georgia, serif;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    white-space: nowrap;
+}
+
+#catBubble::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body{
+    background-image: url("assets/background.png");
+    background-size: cover;       /* stretch to fill */
+    background-position: center;  /* center image */
+    background-repeat: no-repeat; /* prevent tiling */
+}
+
+#muteBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 9999;
+}
+</style>
+
+<script type="module" src="main.js"></script>
+
+</body>
+
+</html>
