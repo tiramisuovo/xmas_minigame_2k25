@@ -95,6 +95,13 @@ muteBtn.addEventListener("click", () => {
 const loadingScreen = document.getElementById("loadingScreen");
 const storyScreen = document.getElementById("storyScreen");
 const gameCanvas = document.getElementById("game");
+const introOverlay = document.getElementById("introOverlay");
+const introMoveLine = document.getElementById("introMove");
+const introShootLine = document.getElementById("introShoot");
+const introNoteLine = document.getElementById("introNote");
+const trapOverlay = document.getElementById("trapOverlay");
+const invertOverlay = document.getElementById("invertOverlay");
+const invertText = document.getElementById("invertText");
 
 const startButton = document.getElementById("startBtn");
 const nameInput = document.getElementById("playerName");
@@ -325,6 +332,38 @@ let invincibleMode = false;
 let assistText = "";
 let assistTextVisible = false;
 window.invincibleMode = invincibleMode;
+let hasShownYiDefeatMessage = false;
+
+function toggleIntroOverlay(show) {
+    if (!introOverlay) return;
+    introOverlay.classList.toggle("visible", show);
+}
+
+function toggleTrapOverlay(show) {
+    if (!trapOverlay) return;
+    trapOverlay.classList.toggle("visible", show);
+}
+
+function toggleInvertOverlay(show, text = "") {
+    if (!invertOverlay || !invertText) return;
+    invertText.textContent = text;
+    invertOverlay.classList.toggle("visible", show);
+}
+
+function setIntroTextForPlayer() {
+    if (!introMoveLine || !introShootLine || !introNoteLine) return;
+
+    introMoveLine.textContent = "Move with Left/Right arrows, jump with Up";
+
+    if (playerName === "yi") {
+        introShootLine.textContent = "Press space to launch tomatoes";
+        introNoteLine.textContent = "(to use up the tomatoes from costco)";
+        introNoteLine.style.display = "block";
+    } else {
+        introShootLine.textContent = "Press space to shoot snowflakes";
+        introNoteLine.style.display = "none";
+    }
+}
 
 function applyRoomLayout(room) {
     platforms = room.platforms.map(p => ({ ...p }));
@@ -481,6 +520,13 @@ function loadRoom(index) {
     currentRoomIndex = index;
     const room = rooms[index];
 
+    toggleInvertOverlay(false, "");
+
+    if (index === 0) {
+        setIntroTextForPlayer();
+    }
+    toggleIntroOverlay(index === 0);
+
     let spritePath = "assets/player.png";
 
     // player start
@@ -595,25 +641,21 @@ function triggerRespectText() {
     ];
 
     let i = 0;
-    respectTextVisible = true;
 
     setTimeout(() => {
-        respectTextVisible = true;
-
-        function next() {
+        const showLine = () => {
             if (i >= lines.length) {
-                respectTextVisible = false;
-                respectText = "";
+                toggleInvertOverlay(false, "");
                 return;
             }
 
-            respectText = lines[i];
+            toggleInvertOverlay(true, lines[i]);
             i++;
 
-            setTimeout(next, i === 3 ? 1200 : 2200);
-        }
+            setTimeout(showLine, i === lines.length ? 1200 : 2200);
+        };
 
-        next();
+        showLine();
     }, 1000); // 1 second delay
 }
 
@@ -647,7 +689,14 @@ const defeatTexts = [
 
 function handleDefeat() {
     defeatInProgress = true;
-    const text = defeatTexts[Math.floor(Math.random() * defeatTexts.length)];
+    let text;
+
+    if (playerName === "yi" && !hasShownYiDefeatMessage) {
+        text = "Skill issues, Mr. Grandmaster?";
+        hasShownYiDefeatMessage = true;
+    } else {
+        text = defeatTexts[Math.floor(Math.random() * defeatTexts.length)];
+    }
 
     // Stop gameplay
     cancelAnimationFrame(gameLoopId);
@@ -743,10 +792,12 @@ function gameLoop() {
                 // Show message 1 sec later
                 setTimeout(() => {
                     showTrapMessage = true;
+                    toggleTrapOverlay(true);
 
                     // Hide message after 2 sec
                     setTimeout(() => {
                         showTrapMessage = false;
+                        toggleTrapOverlay(false);
                     }, 2000);
 
                 }, 1000); // 1 sec delay
@@ -954,24 +1005,6 @@ function gameLoop() {
 
     // Snowball
     snowballs.forEach(sb => sb.draw(ctx));
-
-    if (showTrapMessage) {
-        ctx.fillStyle = "black";          // text color
-        ctx.font = "28px 'Playfair Display'";         // text size
-        ctx.textAlign = "center";
-        ctx.fillText("oops...forgot to patch the floor...", canvas.width / 2 + 200, window.innerHeight - 200);
-    }
-
-    if (respectTextVisible && respectText) {
-        ctx.fillStyle = "black";
-        ctx.font = "28px 'Playfair Display'";
-        ctx.textAlign = "center";
-        ctx.fillText(
-            respectText,
-            canvas.width / 2,
-            canvas.height / 2
-        );
-    }
 
     gameLoopId = requestAnimationFrame(gameLoop);
 }

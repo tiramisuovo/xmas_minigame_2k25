@@ -5,6 +5,8 @@
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light+Two&display=swap" rel="stylesheet">
 
     <title>Christmas MiniGame 2k25</title>
 </head>
@@ -21,72 +23,110 @@
  
 <!-- Loading Screen -->
 <div id="loadingScreen" class="centered-screen">
-    <h1>Santa has outsourced this year's chaos to me AHAHAHA.</h1>
-    <h1>Traveler, tell me thy name?</h1>
+    <div class="hero-card">
+        <h1 class="hero-title">Santa has outsourced this year's chaos to me AHAHAHA.</h1>
+        <h2 class="hero-sub">Traveler, tell me thy name?</h2>
 
-    <input id="playerName" placeholder="Enter name..." />
-    <button id="startBtn">Start</button>
+        <div class="hero-input-row">
+            <input id="playerName" class="frost-input" placeholder="Enter name..." />
+            <button id="startBtn" class="frost-button">Start</button>
+        </div>
+    </div>
 </div>
 
 <!-- Story Screen -->
 <div id="storyScreen" class="centered-screen" style="display:none;">
-    <src>
-        <img src="assets/cat_cage.png" alt="Cat Image" width="200" />
-    </src>
-    <h1 id="storyText"></h1>
-    <h1 id="storyLine2">The cat has been kidnapped, apparently.</h1>
-    <h1 id="storyLine3">Please save her...and stay alive...maybe :)</h1>
-    <h1 id="storyLine4"></h1>
-    <button id="beginGameBtn">Begin Journey</button>
+    <div class="story-card">
+        <div class="story-visual">
+            <img src="assets/cat_cage.png" alt="Cat Image" width="220" />
+        </div>
+        <div class="story-copy">
+            <h1 id="storyText" class="story-title"></h1>
+            <h2 id="storyLine2" class="story-line">The cat has been kidnapped, apparently.</h2>
+            <h2 id="storyLine3" class="story-line">Please save her...and stay alive...maybe :)</h2>
+            <h2 id="storyLine4" class="story-line"></h2>
+            <button id="beginGameBtn" class="frost-button primary">Begin Journey</button>
+        </div>
+    </div>
 </div>
 
 <!-- Post-call Screen -->
 <div id="postCallScreen" class="centered-screen" style="display:none;">
-    <h1>Quick question, traveler.</h1>
-    <h1>Are you post-call?</h1>
+    <div class="post-card">
+        <div class="post-header">
+            <p class="post-tag">quick check-in</p>
+            <h1 class="post-title">Traveler, are you post-call?</h1>
+            <p class="post-sub">No judgment. Just want to set the right level of chaos.</p>
+        </div>
 
-    <div style="margin-top:20px;">
-        <button id="postCallYes">Yes</button>
-        <button id="postCallNo">No</button>
+        <div class="post-actions">
+            <button id="postCallYes" class="frost-button post-choice">Yes</button>
+            <button id="postCallNo" class="frost-button post-choice subtle">No</button>
+        </div>
+
+        <div id="easyModeQuestion" class="post-question" style="display:none;">
+            Would you like to have the easy mode?
+        </div>
+
+        <div id="easyModeButtons" class="post-actions" style="display:none;">
+            <button class="noBtn frost-button subtle">No</button>
+            <button class="noBtn frost-button subtle">No</button>
+        </div>
+
+        <div id="finalResponse" class="post-note" style="display:none;">
+            ok as you wish
+        </div>
+
+        <button id="continueGameBtn" class="frost-button post-cta" style="display:none;">
+            Begin suffering
+        </button>
     </div>
-
-    <h1 id="easyModeQuestion" style="display:none; margin-top:40px;">
-        Would you like to have the easy mode?
-    </h1>
-
-    <div id="easyModeButtons" style="display:none; margin-top:20px;">
-        <button class="noBtn">No</button>
-        <button class="noBtn">No</button>
-    </div>
-
-    <h1 id="finalResponse" style="display:none; margin-top:40px;">
-        ok as you wish
-    </h1>
-
-    <button id="continueGameBtn" style="display:none; margin-top:40px;">
-        Begin suffering
-    </button>
 </div>
 
 <!-- Ending Screen -->
 <div id="endingScreen" class="centered-screen" style="display:none;">
-    <h1>You have saved the cat.</h1>
-    <h1>The cat says thank you.</h1>
-    <h1>Merry Christmas and happy new year!</h1>
-    <h1>Here is your renewal to another year's chaos with me AHAHAHA</h1>
+    <div class="ending-panel">
+        <h1 class="ending-title">You have saved the cat. The cat says thank you.</h1>
+        <h2 class="ending-sub">Merry Christmas and happy new year!</h2>
+        <p class="ending-note">Here is your renewal to another year's chaos with me AHAHAHA</p>
 
-    <div id="catContainer">
-        <img
-            id="endingCat"
-            src="assets/cat.png"
-            alt="Cat Image"
-            width="200"
-        />
-        <div id="catBubble"></div>
+        <div id="catContainer">
+            <img
+                id="endingCat"
+                src="assets/cat.png"
+                alt="Cat Image"
+                width="220"
+            />
+            <div id="catBubble"></div>
+        </div>
     </div>
 </div>
 <!-- Only ONE canvas -->
 <canvas id="game" style="display:none;"></canvas>
+
+<!-- In-game intro overlay -->
+<div id="introOverlay">
+    <div class="intro-card">
+        <div class="intro-label">controls</div>
+        <div class="intro-line" id="introMove">Move with Left/Right arrows, jump with Up</div>
+        <div class="intro-line" id="introShoot">Press space to shoot snowflakes</div>
+        <div class="intro-line intro-note" id="introNote" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- Trap overlay -->
+<div id="trapOverlay">
+    <div class="trap-card">
+        <div class="trap-text">oops... forgot to patch the floor</div>
+    </div>
+</div>
+
+<!-- Invert-control overlay -->
+<div id="invertOverlay">
+    <div class="trap-card">
+        <div class="trap-text" id="invertText"></div>
+    </div>
+</div>
 
 <style>
 .centered-screen {
@@ -103,11 +143,23 @@
     z-index: 999;     /* ensure always on top */
 }
 
+#loadingScreen,
+#storyScreen,
+#postCallScreen {
+    background: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.25), transparent 35%),
+                radial-gradient(circle at 90% 10%, rgba(255,255,255,0.22), transparent 30%),
+                linear-gradient(135deg, rgba(229, 240, 255, 0.75), rgba(255, 246, 252, 0.78));
+    backdrop-filter: blur(4px);
+    padding: 30px;
+}
+
 #playerName {
-    width: 280px;
-    padding: 10px;
+    width: 320px;
+    padding: 12px;
     font-size: 20px;
-    margin-top: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 }
 
 #storyText, #storyLine2, #storyLine3, #storyLine4 {
@@ -130,11 +182,21 @@
 }
 
 #startBtn, #beginGameBtn {
-    padding: 10px 25px;
+    padding: 12px 28px;
     font-size: 20px;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     margin-top: 20px;
+    border: none;
+    background: linear-gradient(135deg, #4b6bff, #67b0ff);
+    color: white;
+    box-shadow: 0 12px 28px rgba(75, 107, 255, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#startBtn:hover, #beginGameBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(75, 107, 255, 0.4);
 }
 
 #snowCanvas {
@@ -148,25 +210,29 @@
 }
 
 #catContainer {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
+    position: relative;
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 14px;
+    margin-top: 38px;
     pointer-events: auto;
 }
 
 #endingCat {
     cursor: pointer;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
 }
 
 #catBubble {
     position: absolute;
-    top: -40px;        /* above cat */
-    left: -20px;       /* to the left */
-    background: white;
-    color: black;
-    padding: 10px 14px;
+    top: -50px;
+    left: -10px;
+    background: #ffffff;
+    color: #111;
+    padding: 12px 16px;
     border-radius: 14px;
-    font-size: 20px;
+    font-size: 18px;
+    border: 2px solid #000;
     font-family: "Playfair Display", Georgia, serif;
     opacity: 0;
     pointer-events: none;
@@ -178,12 +244,24 @@
     content: "";
     position: absolute;
     bottom: -8px;
-    left: 24px;
+    left: 30px;
     width: 0;
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid white;
+    border-top: 8px solid #ffffff;
+}
+
+#catBubble::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 28px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid #000;
 }
 
 html, body {
@@ -206,6 +284,335 @@ body{
     cursor: pointer;
     user-select: none;
     z-index: 9999;
+}
+
+#introOverlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 48px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 1500;
+    font-family: "Playfair Display", Georgia, serif;
+}
+
+#introOverlay.visible {
+    opacity: 1;
+}
+
+.intro-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,240,255,0.92));
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    padding: 22px 32px 26px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    min-width: 420px;
+    margin-top: 12px;
+    text-align: center;
+}
+
+.intro-label {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #5a5a5a;
+    margin-bottom: 8px;
+}
+
+.intro-line {
+    font-size: 24px;
+    color: #111;
+    line-height: 1.3;
+}
+
+.intro-note {
+    font-size: 16px;
+    margin-top: 6px;
+    color: #444;
+}
+
+.hero-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 36px 44px;
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+    max-width: 840px;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 36px;
+    margin: 0 0 12px 0;
+}
+
+.hero-sub {
+    font-size: 24px;
+    margin: 0 0 24px 0;
+    font-weight: 500;
+}
+
+.hero-input-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+}
+
+.hero-input-row #startBtn {
+    margin-top: 0;
+}
+
+.frost-input {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.frost-button {
+    background: linear-gradient(135deg, #4b6bff, #67b0ff);
+    color: white;
+    border: none;
+    box-shadow: 0 12px 28px rgba(75, 107, 255, 0.3);
+    border-radius: 12px;
+}
+
+.frost-button.primary {
+    background: linear-gradient(135deg, #3657e0, #55a2ff);
+    box-shadow: 0 12px 28px rgba(54, 87, 224, 0.35);
+}
+
+.story-card {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 30px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 36px 42px;
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+    max-width: 1100px;
+    width: min(94vw, 1100px);
+}
+
+.story-visual img {
+    max-width: 100%;
+    display: block;
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));
+}
+
+.story-copy {
+    text-align: center;
+}
+
+.story-title {
+    font-size: 32px;
+    margin: 0 0 10px 0;
+}
+
+.story-line {
+    font-size: 22px;
+    margin: 6px 0;
+    font-weight: 500;
+}
+
+.story-copy .frost-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.post-card {
+    background: rgba(255, 255, 255, 0.92);
+    padding: 34px 40px;
+    border-radius: 22px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+    max-width: 760px;
+    width: min(92vw, 780px);
+    text-align: center;
+}
+
+.post-header {
+    margin-bottom: 18px;
+}
+
+.post-tag {
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #5f6b82;
+}
+
+.post-title {
+    margin: 6px 0 8px 0;
+    font-size: 32px;
+}
+
+.post-sub {
+    margin: 0;
+    font-size: 18px;
+    color: #444;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 18px 0;
+}
+
+.post-question {
+    margin: 10px 0 12px 0;
+    font-size: 20px;
+    color: #222;
+}
+
+.post-note {
+    margin: 10px 0 16px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.post-choice {
+    min-width: 120px;
+    padding: 12px 20px;
+    border-radius: 12px;
+}
+
+.noBtn {
+    min-width: 120px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.post-choice.subtle,
+.noBtn.subtle {
+    background: linear-gradient(135deg, #d5deed, #c6d3e6);
+    color: #1a2c4a;
+    box-shadow: 0 10px 24px rgba(118, 136, 170, 0.25);
+}
+
+.post-cta {
+    min-width: 240px;
+    padding: 14px 28px;
+    margin: 12px auto 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+}
+
+#trapOverlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 120px 140px 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1400;
+    font-family: "Playfair Display", Georgia, serif;
+}
+
+#trapOverlay.visible {
+    opacity: 1;
+}
+
+.trap-card {
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 16px;
+    padding: 18px 26px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    text-align: center;
+    min-width: 320px;
+}
+
+.trap-label {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6b6b6b;
+    margin-bottom: 8px;
+}
+
+.trap-text {
+    font-size: 24px;
+    color: #0f0f0f;
+    font-family: "Shadows Into Light Two", "Playfair Display", Georgia, serif;
+}
+
+#endingScreen {
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 40%),
+                radial-gradient(circle at 80% 10%, rgba(255,255,255,0.28), transparent 35%),
+                linear-gradient(135deg, rgba(236, 243, 255, 0.7), rgba(255, 248, 252, 0.72));
+    padding: 40px 24px;
+}
+
+.ending-panel {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 22px;
+    padding: 44px 50px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    max-width: 1120px;
+    width: min(95vw, 1120px);
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.ending-title {
+    font-size: 34px;
+    margin: 0 0 12px 0;
+    color: #0f0f0f;
+}
+
+.ending-sub {
+    font-size: 32px;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #222;
+    font-family: "Berkshire Swash", "Playfair Display", Georgia, serif;
+}
+
+.ending-note {
+    font-size: 18px;
+    margin: 0 0 26px 0;
+    color: #444;
+}
+
+#invertOverlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 120px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1450;
+    font-family: "Playfair Display", Georgia, serif;
+}
+
+#invertOverlay.visible {
+    opacity: 1;
+}
+
+#invertOverlay .trap-text {
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 </style>
 
