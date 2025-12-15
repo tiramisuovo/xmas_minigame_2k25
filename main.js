@@ -157,6 +157,21 @@ startButton.addEventListener("click", () => {
     else if (playerName === "se") {
         inGameName = "bestie forever ✨";
     }
+    else if (playerName === "ge") {
+        inGameName = "the not thicc gamer 🎮";
+    }
+    else if (playerName === "so") {
+        inGameName = "the craft-making scientist 🔬";
+    }
+    else if (playerName === "ma") {
+        inGameName = "the keeper of melodies 🎵";
+    }
+    else if (playerName === "ch") {
+        inGameName = "有金矿的晋江读者 📚";
+    }
+    else if (playerName === "am") {
+        inGameName = "米哈游的忠实粉丝 🐋";
+    }
     else {
         inGameName = playerName;
     }
@@ -185,7 +200,7 @@ startButton.addEventListener("click", () => {
         document.getElementById("storyLine3").style.opacity = 1;
     }, 5000);
 
-    if (playerName === "cr" || playerName === "an" || playerName === "sh" || playerName === "se") {
+    if (playerName === "cr" || playerName === "an" || playerName === "sh" || playerName === "se" || playerName === "je" || playerName === "so" || playerName === "ma") {
         setTimeout(() => {
             typeWriter(
                 document.getElementById("storyLine4"),
@@ -286,6 +301,9 @@ function startGame() {
     if (gameStarted) return;
     gameStarted = true;
 
+    invincibleMode = false;
+    window.invincibleMode = invincibleMode;
+
     endgameMusic.pause();
     endgameMusic.currentTime = 0;
     endgameMusic.muted = bgm.muted;
@@ -354,6 +372,7 @@ const postCallEligibleNames = [
     "cr",
     "an",
     "sh",
+    "ge",
 ];
 
 const bulletSkins = {
@@ -368,7 +387,7 @@ let invertTriggered = false;
 let respectText = "";
 let respectTextVisible = false;
 
-const invinciblePlayers = ["cr", "an", "sh", "se"];
+const invinciblePlayers = ["cr", "an", "sh", "se", "je", "so", "ma"];
 let invincibleMode = false;
 
 let assistText = "";
@@ -433,7 +452,7 @@ function setIntroTextForPlayer() {
 
     if (playerName === "yi") {
         introShootLine.textContent = "Press space to launch tomatoes";
-        introNoteLine.textContent = "(to use up the tomatoes from costco)";
+        introNoteLine.textContent = "(to use up those tomatoes from costco)";
         introNoteLine.style.display = "block";
     } else {
         introShootLine.textContent = "Press space to shoot snowflakes";
@@ -521,7 +540,7 @@ window.addEventListener("keyup", (e) => {
 
 window.addEventListener("keydown", (e) => {
     // Ctrl + Shift + N → skip forward
-    if (e.key.toLowerCase() === "n") {
+    if (e.key.toLowerCase() === "0") {
         devSkipForward();
     }
 });
@@ -628,7 +647,8 @@ function loadRoom(index) {
 
     // boss
     if (room.boss && room.boss.x !== undefined) {
-        boss = new Boss(room.boss.x, room.boss.y);
+        const tougherYiBoss = playerName === "yi";
+        boss = new Boss(room.boss.x, room.boss.y, room.boss.maxY, tougherYiBoss);
     } else {
         boss = null;
     }

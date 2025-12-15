@@ -1,5 +1,5 @@
 export default class Boss {
-    constructor(x, y, maxY = Infinity) {
+    constructor(x, y, maxY = Infinity, isYi = false) {
         this.x = x;
         this.y = y;
 
@@ -7,12 +7,12 @@ export default class Boss {
         this.height = 180;
         this.maxY = maxY
 
-        this.maxHP = 6;
-        this.hp = 6;
+        this.maxHP = isYi ? 10 : 6;
+        this.hp = this.maxHP;
 
         this.vx = 0;
         this.vy = 0;
-        this.speed = 1.5;
+        this.speed = isYi ? 2.4 : 1.5;
         this.gravity = 0.6;
 
         this.jumpStrength = -18;
@@ -24,11 +24,11 @@ export default class Boss {
         this.facing = 1;
 
         // Snowball attack timers
-        this.shootCooldown = 4000;  
+        this.shootCooldown = isYi ? 3000 : 4000;
         this.lastShot = 0;
 
         // For summoning minions (optional)
-        this.summonCooldown = 9000;
+        this.summonCooldown = isYi ? 6500 : 9000;
         this.lastSummon = 0;
 
         this.alive = true;
