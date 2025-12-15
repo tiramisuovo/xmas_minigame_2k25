@@ -1,10 +1,10 @@
-import Player from "./Player.js";
+import Player from "./player.js";
 import Bullet from "./bullet.js";
 import Enemy from "./enemy.js";
 import { buildRooms } from "./rooms.js";
-import Gift from "./Gift.js";
-import Boss from "./Boss.js";
-import Snowball from "./Snowball.js";
+import Gift from "./gift.js";
+import Boss from "./boss.js";
+import Snowball from "./snowball.js";
 
 // ----- SNOW EFFECT -----
 const snowCanvas = document.getElementById("snowCanvas");
