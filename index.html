@@ -14,9 +14,8 @@
 <body>
 <canvas id="snowCanvas"></canvas>
 
-<!-- MUSIC DEACTIVATED
 <audio id="bgm" src="assets/music.mp3" loop></audio>
--->
+<audio id="endgameMusic" src="assets/endgame_music.mp3" loop></audio>
 
 <!-- Mute button -->
 <div id="muteBtn">🔊</div>
@@ -89,15 +88,50 @@
         <h1 class="ending-title">You have saved the cat. The cat says thank you.</h1>
         <h2 class="ending-sub">Merry Christmas and happy new year!</h2>
         <p class="ending-note">Here is your renewal to another year's chaos with me AHAHAHA</p>
+        <div id="catSection">
+            <div id="catContainer">
+                <img
+                    id="endingCat"
+                    src="assets/cat.png"
+                    alt="Cat Image"
+                    width="220"
+                />
+                <div id="catBubble"></div>
+            </div>
 
-        <div id="catContainer">
-            <img
-                id="endingCat"
-                src="assets/cat.png"
-                alt="Cat Image"
-                width="220"
-            />
-            <div id="catBubble"></div>
+    <button id="openReceiptBtn" class="frost-button primary receipt-trigger">
+        View your gift receipt
+    </button>
+</div>
+    </div>
+</div>
+
+<!-- Gift receipt popup -->
+<div id="receiptOverlay">
+    <div class="receipt-card">
+        <button id="receiptClose" aria-label="Close receipt">×</button>
+        <div class="receipt-header">
+            Gift Receipt 2k25
+            <div class="receipt-subtitle">Issued to a brave traveler</div>
+        </div>
+        <div class="receipt-content">
+            <div class="receipt-left">
+                <div class="receipt-portrait">
+                    <img src="assets/player.png" alt="Player portrait">
+                    <div id="receiptName" class="receipt-name"></div>
+                </div>
+            </div>
+            <div class="receipt-right">
+                <div class="receipt-row">
+                    <span class="receipt-label">Gifts collected</span>
+                    <span id="receiptGifts" class="receipt-value"></span>
+                </div>
+                <div id="receiptGiftMsg" class="receipt-msg"></div>
+                <div class="receipt-note">
+                    Please keep your gift receipt. It may be required for future chaos.
+                </div>
+                <div id="receiptStamp" class="receipt-stamp">Certified by Tiramisu</div>
+            </div>
         </div>
     </div>
 </div>
@@ -188,15 +222,15 @@
     cursor: pointer;
     margin-top: 20px;
     border: none;
-    background: linear-gradient(135deg, #4b6bff, #67b0ff);
+    background: linear-gradient(135deg, #7d8ca3, #9aa9bd);
     color: white;
-    box-shadow: 0 12px 28px rgba(75, 107, 255, 0.3);
+    box-shadow: 0 12px 28px rgba(109, 126, 148, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #startBtn:hover, #beginGameBtn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 14px 32px rgba(75, 107, 255, 0.4);
+    box-shadow: 0 14px 32px rgba(109, 126, 148, 0.38);
 }
 
 #snowCanvas {
@@ -304,6 +338,14 @@ body{
     opacity: 1;
 }
 
+#catSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 24px;
+    gap: 18px;
+}
+
 .intro-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,240,255,0.92));
     border: 1px solid rgba(0, 0, 0, 0.08);
@@ -375,16 +417,16 @@ body{
 }
 
 .frost-button {
-    background: linear-gradient(135deg, #4b6bff, #67b0ff);
+    background: linear-gradient(135deg, #7d8ca3, #9aa9bd);
     color: white;
     border: none;
-    box-shadow: 0 12px 28px rgba(75, 107, 255, 0.3);
+    box-shadow: 0 12px 28px rgba(109, 126, 148, 0.3);
     border-radius: 12px;
 }
 
 .frost-button.primary {
-    background: linear-gradient(135deg, #3657e0, #55a2ff);
-    box-shadow: 0 12px 28px rgba(54, 87, 224, 0.35);
+    background: linear-gradient(135deg, #6a7b92, #8b9ab1);
+    box-shadow: 0 12px 28px rgba(97, 115, 138, 0.32);
 }
 
 .story-card {
@@ -427,6 +469,17 @@ body{
     justify-content: center;
     align-items: center;
     margin-top: 18px;
+}
+
+.receipt-trigger {
+    margin: 18px 0 0 0;
+    min-width: 260px;
+    padding: 14px 28px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 20px;
 }
 
 .post-card {
@@ -564,10 +617,10 @@ body{
 .ending-panel {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 22px;
-    padding: 44px 50px;
+    padding: 60px 64px;
     box-shadow: 0 18px 50px rgba(0,0,0,0.18);
-    max-width: 1120px;
-    width: min(95vw, 1120px);
+    max-width: 1280px;
+    width: min(96vw, 1280px);
     text-align: center;
     border: 1px solid rgba(0,0,0,0.06);
 }
@@ -613,6 +666,154 @@ body{
 #invertOverlay .trap-text {
     font-weight: 800;
     letter-spacing: 1px;
+}
+
+#receiptOverlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1600;
+}
+
+#receiptOverlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.receipt-card {
+    position: relative;
+    background: rgba(255,255,255,0.95);
+    border-radius: 18px;
+    padding: 26px 30px 24px;
+    width: min(520px, 90vw);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+    border: 1px solid rgba(0,0,0,0.06);
+    text-align: left;
+}
+
+#receiptClose {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+    line-height: 1;
+}
+
+.receipt-header {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.receipt-subtitle {
+    font-size: 16px;
+    font-style: italic;
+    color: #333;
+}
+
+.receipt-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(242,246,255,0.9));
+}
+
+.receipt-left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.receipt-portrait {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+}
+
+.receipt-portrait img {
+    width: 160px;
+    height: auto;
+}
+
+.receipt-name {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.receipt-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 22px;
+    align-items: baseline;
+}
+
+.receipt-label {
+    color: #222;
+}
+
+.receipt-value {
+    font-weight: 700;
+    color: #111;
+}
+
+.receipt-msg {
+    font-size: 16px;
+    color: #2d2d2d;
+    font-style: italic;
+}
+
+.receipt-note {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #222;
+    line-height: 1.4;
+}
+
+.receipt-stamp {
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 8px 14px;
+    border: 2px solid #d82f45;
+    color: #d82f45;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-radius: 8px;
+    display: inline-block;
+    opacity: 0.85;
+    transform: scale(0.8) rotate(-8deg);
+}
+
+.receipt-stamp.animate {
+    animation: stamp-pop 0.45s ease forwards;
+}
+
+@keyframes stamp-pop {
+    0% { opacity: 0; transform: scale(0.6) rotate(-14deg); }
+    60% { opacity: 0.9; transform: scale(1.05) rotate(-6deg); }
+    100% { opacity: 0.85; transform: scale(1) rotate(-8deg); }
 }
 </style>
 

@@ -27,15 +27,11 @@ export default class Bullet {
         const drawW = this.width * this.drawScale;
         const drawH = this.height * this.drawScale;
 
-        // ⭐ Align sprite EXACTLY to hitbox top-left
+        // Align sprite to hitbox top-left; skip drawing until loaded
         const drawX = this.x;
         const drawY = this.y;
 
-        if (this.image.complete) {
-            ctx.drawImage(this.image, drawX, drawY, drawW, drawH);
-        } else {
-            ctx.fillStyle = "red";
-            ctx.fillRect(drawX, drawY, drawW, drawH);
-        }
+        if (!this.image.complete) return;
+        ctx.drawImage(this.image, drawX, drawY, drawW, drawH);
     }
 }

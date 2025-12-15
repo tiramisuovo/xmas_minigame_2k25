@@ -73,16 +73,19 @@ function typeWriter(element, text, speed = 40) {
 // ===============================
 // MUSIC
 const bgm = document.getElementById("bgm");
+const endgameMusic = document.getElementById("endgameMusic");
 const muteBtn = document.getElementById("muteBtn");
 
 // Start music after user interaction (browser rule)
 window.addEventListener("click", () => {
     if (bgm.paused) bgm.play();
+    endgameMusic.muted = bgm.muted;
 }, { once: true });
 
 // Toggle mute
 muteBtn.addEventListener("click", () => {
     bgm.muted = !bgm.muted;
+    endgameMusic.muted = bgm.muted;
     muteBtn.textContent = bgm.muted ? "🔇" : "🔊";
 });
 
@@ -102,6 +105,13 @@ const introNoteLine = document.getElementById("introNote");
 const trapOverlay = document.getElementById("trapOverlay");
 const invertOverlay = document.getElementById("invertOverlay");
 const invertText = document.getElementById("invertText");
+const receiptOverlay = document.getElementById("receiptOverlay");
+const receiptName = document.getElementById("receiptName");
+const receiptGifts = document.getElementById("receiptGifts");
+const receiptGiftMsg = document.getElementById("receiptGiftMsg");
+const receiptClose = document.getElementById("receiptClose");
+const openReceiptBtn = document.getElementById("openReceiptBtn");
+const receiptStamp = document.getElementById("receiptStamp");
 
 const startButton = document.getElementById("startBtn");
 const nameInput = document.getElementById("playerName");
@@ -111,6 +121,7 @@ const beginGameBtn = document.getElementById("beginGameBtn");
 let rawName = "";
 let playerName = "";
 let gameStarted = false;
+let greetingName = "";
 
 // -------------------------------
 // STEP 1 — ENTER NAME
@@ -149,6 +160,7 @@ startButton.addEventListener("click", () => {
     else {
         inGameName = playerName;
     }
+    greetingName = inGameName;
     typeWriter(
         document.getElementById("storyText"),
         `Welcome, ${inGameName}.`,
@@ -229,6 +241,28 @@ continueGameBtn.addEventListener("click", () => {
     postCallScreen.style.display = "none";
     startGame();
 });
+
+if (openReceiptBtn) {
+    openReceiptBtn.addEventListener("click", () => {
+        populateReceipt();
+        animateReceiptStamp();
+        toggleReceiptOverlay(true);
+    });
+}
+
+if (receiptClose) {
+    receiptClose.addEventListener("click", () => {
+        toggleReceiptOverlay(false);
+    });
+}
+
+if (receiptOverlay) {
+    receiptOverlay.addEventListener("click", (e) => {
+        if (e.target === receiptOverlay) {
+            toggleReceiptOverlay(false);
+        }
+    });
+}
 // -------------------------------
 // STEP 2 — START GAME AFTER STORY
 // -------------------------------
@@ -251,6 +285,14 @@ beginGameBtn.addEventListener("click", () => {
 function startGame() {
     if (gameStarted) return;
     gameStarted = true;
+
+    endgameMusic.pause();
+    endgameMusic.currentTime = 0;
+    endgameMusic.muted = bgm.muted;
+    bgm.currentTime = 0;
+    bgm.play().catch(() => {});
+
+    toggleReceiptOverlay(false);
 
     gameCanvas.style.display = "block";
     loadRoom(0);
@@ -348,6 +390,40 @@ function toggleInvertOverlay(show, text = "") {
     if (!invertOverlay || !invertText) return;
     invertText.textContent = text;
     invertOverlay.classList.toggle("visible", show);
+}
+
+function toggleReceiptOverlay(show) {
+    if (!receiptOverlay) return;
+    receiptOverlay.classList.toggle("visible", show);
+}
+
+function populateReceipt() {
+    if (!receiptName || !receiptGifts) return;
+    const nameText = greetingName || playerName || "Traveler";
+    receiptName.textContent = nameText;
+    receiptGifts.textContent = giftCount.toString();
+
+    if (receiptGiftMsg) {
+        let msg = "A symbolic receipt.";
+        if (giftCount >= 13) {
+            msg = "The cat is impressed.";
+        } else if (giftCount >= 9) {
+            msg = "Well above seasonal expectations.";
+        } else if (giftCount >= 4) {
+            msg = "Consistent effort detected.";
+        } else if (giftCount >= 1) {
+            msg = "Proof of participation.";
+        }
+        receiptGiftMsg.textContent = msg;
+    }
+}
+
+function animateReceiptStamp() {
+    if (!receiptStamp) return;
+    receiptStamp.classList.remove("animate");
+    // force reflow
+    void receiptStamp.offsetWidth;
+    receiptStamp.classList.add("animate");
 }
 
 function setIntroTextForPlayer() {
@@ -1015,12 +1091,18 @@ function endGame() {
     // Stop rendering logic
     cancelAnimationFrame(gameLoopId);
 
+    // Swap to ending music
+    bgm.pause();
+    endgameMusic.currentTime = 0;
+    endgameMusic.play().catch(() => {});
+
     // Hide canvas
     gameCanvas.style.display = "none";
 
     // Show ending screen
     const ending = document.getElementById("endingScreen");
     ending.style.display = "flex";
+    if (openReceiptBtn) openReceiptBtn.style.display = "inline-flex";
 
 }
 
