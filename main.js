@@ -434,10 +434,11 @@ function snapPlayerToPlatform() {
 }
 
 function getSupportPlatform(centerX, minY = -Infinity) {
+    const tolerance = 2;
     const candidates = platforms.filter(p =>
         !p.invisible &&
-        centerX >= p.x &&
-        centerX <= p.x + p.width &&
+        centerX >= p.x - tolerance &&
+        centerX <= p.x + p.width + tolerance &&
         p.y >= minY
     );
 
@@ -561,6 +562,7 @@ function handleResize() {
         snapPlayerToPlatform();
         snapEnemiesToPlatforms();
         alignDoorToGround();
+        keepPlayerGrounded();
     }
 
 }
@@ -687,6 +689,7 @@ function loadRoom(index) {
     snapPlayerToPlatform();
     snapEnemiesToPlatforms();
     alignDoorToGround();
+    keepPlayerGrounded();
 }
 
 // Room exit check ----------------------------------------------
