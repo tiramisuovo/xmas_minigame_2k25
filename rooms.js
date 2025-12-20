@@ -209,13 +209,12 @@ const roomTemplates = [
         // Mini ornament under star
         { x: BASE_WIDTH / 2 - 20, y: BASE_HEIGHT - 860 }
     ],
-
-    exitDoor: {
-        x: BASE_WIDTH / 2 - 20,
-        y: BASE_HEIGHT - 780,
-        width: 40,
-        height: 60
-    }
+        exitDoor: {
+            x: BASE_WIDTH / 2 - 20,
+            y: BASE_HEIGHT - 780,
+            width: 40,
+            height: 60
+        }
 }
 ];
 

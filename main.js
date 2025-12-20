@@ -401,28 +401,66 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
-    const centerX = player.x + player.width / 2;
+    const support = getSupportPlatform(player.x + player.width / 2);
+    if (!support) return;
+
+    player.y = support.y - player.height;
+    player.vy = 0;
+}
+
+function getSupportPlatform(centerX, minY = -Infinity) {
     const candidates = platforms.filter(p =>
         !p.invisible &&
         centerX >= p.x &&
-        centerX <= p.x + p.width
+        centerX <= p.x + p.width &&
+        p.y >= minY
     );
 
-    let landing;
     if (candidates.length) {
-        landing = candidates.reduce((best, current) => {
-            const bestDist = Math.abs((best.y - best.height) - player.y);
-            const curDist = Math.abs((current.y - current.height) - player.y);
-            return curDist < bestDist ? current : best;
-        });
-    } else {
-        landing = platforms
-            .filter(p => !p.invisible)
-            .reduce((lowest, current) => (current.y > lowest.y ? current : lowest));
+        return candidates.reduce((closest, current) =>
+            current.y < closest.y ? current : closest
+        );
     }
 
-    player.y = landing.y - player.height;
-    player.vy = 0;
+    const visibles = platforms.filter(p => !p.invisible);
+    if (!visibles.length) return null;
+    return visibles.reduce((lowest, current) =>
+        current.y > lowest.y ? current : lowest
+    );
+}
+
+function snapEnemiesToPlatforms() {
+    enemies.forEach(e => {
+        const support = getSupportPlatform(e.x + e.width / 2, e.y);
+        if (support) {
+            e.y = support.y - e.height;
+            e.vy = 0;
+        }
+    });
+}
+
+function keepEnemiesGrounded() {
+    enemies.forEach(e => {
+        const support = getSupportPlatform(e.x + e.width / 2, e.y);
+        if (support) {
+            const targetY = support.y - e.height;
+            if (e.y > targetY) {
+                e.y = targetY;
+                e.vy = 0;
+            }
+        }
+    });
+}
+
+function alignDoorToGround() {
+    const room = rooms[currentRoomIndex];
+    if (!room || !room.exitDoor) return;
+
+    const door = room.exitDoor;
+    const support = getSupportPlatform(door.x + door.width / 2, door.y);
+    if (support) {
+        door.y = support.y - door.height;
+    }
 }
 
 function scaleActiveEntities(scaleX, scaleY) {
@@ -474,6 +512,8 @@ function handleResize() {
         scaleActiveEntities(scaleX, scaleY);
         applyRoomLayout(rooms[currentRoomIndex]);
         snapPlayerToPlatform();
+        snapEnemiesToPlatforms();
+        alignDoorToGround();
     }
 
 }
@@ -585,6 +625,8 @@ function loadRoom(index) {
 
     applyRoomLayout(room);
     snapPlayerToPlatform();
+    snapEnemiesToPlatforms();
+    alignDoorToGround();
 
     enemies = room.enemies.map(e => new Enemy(e.x, e.y));
 
@@ -848,6 +890,8 @@ function gameLoop() {
             }
         );
     }
+
+    keepEnemiesGrounded();
     
     bullets.forEach(b => b.update());
     bullets = bullets.filter(b => !b.isOffScreen(canvas.width));
