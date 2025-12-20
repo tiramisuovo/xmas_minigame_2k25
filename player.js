@@ -84,22 +84,28 @@ export default class Player {
 
         // FLOOR LANDING CHECK
         for (let p of platforms) {
-            const withinX =
-                this.x + this.width > p.x &&
-                this.x < p.x + p.width;
+        const withinX =
+            this.x + this.width > p.x &&
+            this.x < p.x + p.width;
 
-            const wasAbove = this.y + this.height <= p.y;
-            const willFallThrough = nextY + this.height >= p.y;
+        const bottomNow  = this.y + this.height;
+        const bottomNext = nextY + this.height;
 
-            if (this.vy >= 0 && withinX && wasAbove && willFallThrough) {
-                nextY = p.y - this.height;
-                this.vy = 0;
-                this.canJump = true;
-                onPlatform = true;
-                break;
-            }
+        const tolerance = 10; // 👈 key: allow a little penetration
+
+        if (
+            this.vy >= 0 &&
+            withinX &&
+            bottomNow <= p.y + tolerance &&
+            bottomNext >= p.y
+        ) {
+            nextY = p.y - this.height;
+            this.vy = 0;
+            this.canJump = true;
+            onPlatform = true;
+            break;
         }
-
+        }
         // CEILING COLLISION (hit underside of platform)
         for (let p of platforms) {
             const withinX =

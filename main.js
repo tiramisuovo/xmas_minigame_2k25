@@ -425,8 +425,7 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
-    const feet = player.y + player.height;
-    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
+    const support = getSupportPlatform(player.x + player.width / 2);
     if (!support) return;
 
     player.y = support.y - player.height;
@@ -492,10 +491,9 @@ function placeEntityOnPlatform(entity, platform) {
 
 function keepPlayerGrounded() {
     if (!player) return;
-    const feet = player.y + player.height;
-    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
-    if (support && player.y > support.y - player.height) {
-        placeEntityOnPlatform(player, support);
+    const support = getSupportPlatform(player.x + player.width / 2);
+    if (support) {
+        player.y = support.y - player.height;
         player.vy = 0;
         player.canJump = true;
     }
