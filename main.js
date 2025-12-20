@@ -390,20 +390,23 @@ const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
 
 function getEntityScale() {
-    return Math.min(canvas.width / BASE_WIDTH, canvas.height / BASE_HEIGHT);
+    return {
+        x: canvas.width / BASE_WIDTH,
+        y: canvas.height / BASE_HEIGHT
+    };
 }
 
 function applyEntityScale(scale) {
     if (player && typeof player.applyScale === "function") {
-        player.applyScale(scale);
+        player.applyScale(scale.x, scale.y);
     }
     enemies.forEach(e => {
         if (typeof e.applyScale === "function") {
-            e.applyScale(scale);
+            e.applyScale(scale.x, scale.y);
         }
     });
     if (boss && typeof boss.applyScale === "function") {
-        boss.applyScale(scale);
+        boss.applyScale(scale.x, scale.y);
     }
 }
 

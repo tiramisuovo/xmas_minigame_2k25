@@ -39,12 +39,12 @@ export default class Boss {
         this.alive = true;
     }
 
-    applyScale(scale) {
-        this.width = this.baseWidth * scale;
-        this.height = this.baseHeight * scale;
-        this.speed = this.baseSpeed * scale;
-        this.gravity = this.baseGravity * scale;
-        this.jumpStrength = this.baseJumpStrength * scale;
+    applyScale(scaleX, scaleY) {
+        this.width = this.baseWidth * scaleX;
+        this.height = this.baseHeight * scaleY;
+        this.speed = this.baseSpeed * scaleX;
+        this.gravity = this.baseGravity * scaleY;
+        this.jumpStrength = this.baseJumpStrength * scaleY;
     }
 
     update(player, platforms, spawnEnemyCallback, shootCallback) {

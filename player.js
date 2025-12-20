@@ -29,7 +29,7 @@ export default class Player {
         this.coyoteTimeMax = 180; // ms (use 300–420 for assist later)
     }
 
-    applyScale(scale) {
+    applyScale(scaleX, scaleY) {
         const baseWidth = 100;
         const baseHeight = 100;
         const baseSpeed = 4.6;
@@ -39,14 +39,14 @@ export default class Player {
         const baseShootY = 20;
         const baseKnockback = 10;
 
-        this.width = baseWidth * scale;
-        this.height = baseHeight * scale;
-        this.speed = baseSpeed * scale;
-        this.gravity = baseGravity * scale;
-        this.jumpStrength = baseJump * scale;
-        this.shootOffsetX = baseShootX * scale;
-        this.shootOffsetY = baseShootY * scale;
-        this.knockback = baseKnockback * scale;
+        this.width = baseWidth * scaleX;
+        this.height = baseHeight * scaleY;
+        this.speed = baseSpeed * scaleX;
+        this.gravity = baseGravity * scaleY;
+        this.jumpStrength = baseJump * scaleY;
+        this.shootOffsetX = baseShootX * scaleX;
+        this.shootOffsetY = baseShootY * scaleY;
+        this.knockback = baseKnockback * scaleX;
         this.scale = 1; // hitbox already scaled
     }
 

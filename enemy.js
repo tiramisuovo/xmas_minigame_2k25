@@ -20,7 +20,7 @@ export default class Enemy {
         this.drawScale = 1;
     }
 
-    applyScale(scale) {
+    applyScale(scaleX, scaleY) {
         const baseWidth = 100;
         const baseHeight = 100;
         const baseSpeed = 1.95;
@@ -28,12 +28,12 @@ export default class Enemy {
         const baseGravity = 0.6;
         const baseJumpStrength = -15;
 
-        this.width = baseWidth * scale;
-        this.height = baseHeight * scale;
-        this.speed = baseSpeed * scale;
-        this.jumpSpeed = baseJumpSpeed * scale;
-        this.gravity = baseGravity * scale;
-        this.jumpStrength = baseJumpStrength * scale;
+        this.width = baseWidth * scaleX;
+        this.height = baseHeight * scaleY;
+        this.speed = baseSpeed * scaleX;
+        this.jumpSpeed = baseJumpSpeed * scaleX;
+        this.gravity = baseGravity * scaleY;
+        this.jumpStrength = baseJumpStrength * scaleY;
         this.scale = 1;
         this.drawScale = 1;
     }
