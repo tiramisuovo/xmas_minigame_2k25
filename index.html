@@ -617,10 +617,11 @@ body{
 }
 
 #endingScreen {
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 40%),
-                radial-gradient(circle at 80% 10%, rgba(255,255,255,0.28), transparent 35%),
-                linear-gradient(135deg, rgba(236, 243, 255, 0.7), rgba(255, 248, 252, 0.72));
-    padding: 40px 24px;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .ending-panel {
