@@ -401,18 +401,25 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
+    const centerX = player.x + player.width / 2;
     const candidates = platforms.filter(p =>
         !p.invisible &&
-        player.x + player.width > p.x &&
-        player.x < p.x + p.width &&
-        p.y >= player.y
+        centerX >= p.x &&
+        centerX <= p.x + p.width
     );
 
-    if (!candidates.length) return;
-
-    const landing = candidates.reduce((lowest, current) =>
-        current.y < lowest.y ? current : lowest
-    );
+    let landing;
+    if (candidates.length) {
+        landing = candidates.reduce((best, current) => {
+            const bestDist = Math.abs((best.y - best.height) - player.y);
+            const curDist = Math.abs((current.y - current.height) - player.y);
+            return curDist < bestDist ? current : best;
+        });
+    } else {
+        landing = platforms
+            .filter(p => !p.invisible)
+            .reduce((lowest, current) => (current.y > lowest.y ? current : lowest));
+    }
 
     player.y = landing.y - player.height;
     player.vy = 0;
@@ -562,6 +569,8 @@ function loadRoom(index) {
     let spritePath = "assets/player.png";
 
     player = new Player(room.playerStart.x, room.playerStart.y, spritePath);
+    player.vy = 0;
+    player.x = Math.min(Math.max(player.x, 0), canvas.width - player.width);
 
     // Invert controls for the special player in room 2
     if (
