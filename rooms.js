@@ -210,7 +210,7 @@ const roomTemplates = [
         { x: BASE_WIDTH / 2 - 20, y: BASE_HEIGHT - 860 }
     ],
         exitDoor: {
-            x: BASE_WIDTH / 2 - 20,
+            x: BASE_WIDTH / 2 - 30,
             y: BASE_HEIGHT - 780,
             width: 40,
             height: 60

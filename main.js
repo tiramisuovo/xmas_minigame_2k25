@@ -32,6 +32,42 @@ const muteBtn = document.getElementById("muteBtn");
 const audioControls = setupAudio({ bgm, endgameMusic, muteBtn });
 
 
+// Loading -------------------------------------------------------
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+    img.src = src;
+  });
+}
+
+const assets = {};
+const assetsReady = (async () => {
+  const [
+    groundTile,
+    door,
+    playerSprite,
+    snowflake,
+    tomato
+  ] = await Promise.all([
+    loadImage("assets/ground_tile.png"),
+    loadImage("assets/door.png"),
+    loadImage("assets/player.png"),
+    loadImage("assets/snowflake.png"),
+    loadImage("assets/tomato.png"),
+  ]);
+
+  assets.iceTile = groundTile;
+  assets.doorImg = door;
+  assets.playerSprite = playerSprite;
+  assets.bulletSnowflake = snowflake;
+  assets.bulletTomato = tomato;
+
+  return assets;
+})();
+
 // Startup flow + name system ------------------------------------
 const loadingScreen = document.getElementById("loadingScreen");
 const storyScreen = document.getElementById("storyScreen");
@@ -61,9 +97,21 @@ let playerName = "";
 let gameStarted = false;
 let greetingName = "";
 
-startButton.addEventListener("click", () => {
+startButton.addEventListener("click", async () => {
+    // Optional: show "Loading..." text / disable button
+    startButton.disabled = true;
+
+    try {
+        await assetsReady; // wait until images are decoded and ready
+    } catch (e) {
+        console.error(e);
+        // You can show an error message on loadingScreen here if you want
+    } finally {
+        startButton.disabled = false;
+    }
+
     rawName = nameInput.value.trim().toLowerCase();
-    playerName = rawName[0]+rawName[1] || ""; // first two letters
+    playerName = rawName[0] + rawName[1] || "";
     if (!playerName) return;
 
     loadingScreen.style.display = "none";
@@ -455,7 +503,7 @@ function getSupportPlatform(centerX, minY = -Infinity) {
     );
 }
 
-function snapEnemiesToPlatforms() {
+function snapEnemiesToPlatforms() { 
     enemies.forEach(e => {
         const feet = e.y + e.height;
         const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
@@ -877,6 +925,14 @@ function gameLoop() {
         }
     }
     player.update(platforms);
+    // Soft ceiling: stop upward motion, do not bounce
+    const CEILING_Y = 0;
+    const CEILING_BUFFER = 12; // let them go slightly "into" the ceiling visually
+
+    if (player.y < CEILING_Y - CEILING_BUFFER) {
+    player.y = CEILING_Y - CEILING_BUFFER;
+    if (player.vy < 0) player.vy = 0;
+    }
 
     // Crumble platforms disappear on contact and trigger trap once
     for (let c of crumblePlatforms) {
@@ -1029,11 +1085,21 @@ function gameLoop() {
     // Draw exit door
     const door = rooms[currentRoomIndex].exitDoor;
 
+    const DOOR_SPRITE_SCALE = 2; // keep your current look
+    const drawW = door.width * DOOR_SPRITE_SCALE;
+    const drawH = door.height * DOOR_SPRITE_SCALE;
+
+    // Shift the sprite up by the "extra" height so the sprite bottom lines up with the hitbox bottom.
+    const spriteOffsetY = drawH - door.height;
+    const drawX = door.x;
+    const drawY = door.y - spriteOffsetY;
+
     if (doorLoaded) {
-        ctx.drawImage(doorImg, door.x, door.y - 60, door.width *2, door.height *2);
+    ctx.drawImage(doorImg, drawX, drawY, drawW, drawH);
     } else {
-        ctx.fillStyle = "gold";
-        ctx.fillRect(door.x, door.y, door.width, door.height);
+    // optional: make fallback match the sprite footprint (so it does not “jump” when loaded)
+    ctx.fillStyle = "gold";
+    ctx.fillRect(drawX, drawY, drawW, drawH);
     }
 
     // Assist mode text
