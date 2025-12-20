@@ -422,12 +422,12 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
-    const feet = player.y + player.height;
-    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
+    const support = getSupportPlatform(player.x + player.width / 2);
     if (!support) return;
 
     player.y = support.y - player.height;
     player.vy = 0;
+    player.canJump = true;
 }
 
 function getSupportPlatform(centerX, minY = -Infinity) {
