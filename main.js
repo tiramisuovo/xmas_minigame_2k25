@@ -425,16 +425,18 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
-    const support = getSupportPlatform(player.x + player.width / 2);
+    const feet = player.y + player.height;
+    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
     if (!support) return;
 
-    placeEntityOnPlatform(player, support);
+    player.y = support.y - player.height;
+    player.vy = 0;
     player.vy = 0;
     player.canJump = true;
 }
 
 function getSupportPlatform(centerX, minY = -Infinity) {
-    const tolerance = 2;
+    const tolerance = 20;
     const candidates = platforms.filter(p =>
         !p.invisible &&
         centerX >= p.x - tolerance &&
@@ -460,24 +462,14 @@ function snapEnemiesToPlatforms() {
         const feet = e.y + e.height;
         const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
         if (support) {
-            placeEntityOnPlatform(e, support);
+            e.y = support.y - e.height;
             e.vy = 0;
         }
     });
 }
 
 function keepEnemiesGrounded() {
-    enemies.forEach(e => {
-        const feet = e.y + e.height;
-        const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
-        if (support) {
-            const targetY = support.y - e.height;
-            if (e.y > targetY) {
-                placeEntityOnPlatform(e, support);
-                e.vy = 0;
-            }
-        }
-    });
+    // no-op after removing per-frame grounding for enemies
 }
 
 function alignDoorToGround() {
@@ -947,7 +939,6 @@ function gameLoop() {
         );
     }
 
-    keepEnemiesGrounded();
     
     bullets.forEach(b => b.update());
     bullets = bullets.filter(b => !b.isOffScreen(canvas.width));
