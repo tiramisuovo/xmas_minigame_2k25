@@ -6,7 +6,7 @@ import Gift from "./gift.js";
 import Boss from "./boss.js";
 import Snowball from "./snowball.js";
 
-// ----- SNOW EFFECT -----
+// Snow overlay -------------------------------------------------
 const snowCanvas = document.getElementById("snowCanvas");
 const snowCtx = snowCanvas.getContext("2d");
 
@@ -36,7 +36,7 @@ function updateSnow() {
         flake.x += flake.drift;
 
         if (flake.y > snowCanvas.height) {
-            flake.y = -10;                // restart from top
+            flake.y = -10;
             flake.x = Math.random() * snowCanvas.width;
         }
 
@@ -52,8 +52,7 @@ function updateSnow() {
 createSnowflakes();
 updateSnow();
 
-// ===============================
-// TYPEWRITER EFFECT
+// Typewriter effect helper -------------------------------------
 function typeWriter(element, text, speed = 40) {
     element.innerText = "";
     let i = 0;
@@ -70,8 +69,7 @@ function typeWriter(element, text, speed = 40) {
 }
 
 
-// ===============================
-// MUSIC
+// Music controls ------------------------------------------------
 const bgm = document.getElementById("bgm");
 const endgameMusic = document.getElementById("endgameMusic");
 const muteBtn = document.getElementById("muteBtn");
@@ -82,7 +80,6 @@ window.addEventListener("click", () => {
     endgameMusic.muted = bgm.muted;
 }, { once: true });
 
-// Toggle mute
 muteBtn.addEventListener("click", () => {
     bgm.muted = !bgm.muted;
     endgameMusic.muted = bgm.muted;
@@ -90,11 +87,7 @@ muteBtn.addEventListener("click", () => {
 });
 
 
-// ===============================
-// STARTUP SCREENS + NAME SYSTEM
-// ===============================
-
-// Elements
+// Startup flow + name system ------------------------------------
 const loadingScreen = document.getElementById("loadingScreen");
 const storyScreen = document.getElementById("storyScreen");
 const gameCanvas = document.getElementById("game");
@@ -123,18 +116,12 @@ let playerName = "";
 let gameStarted = false;
 let greetingName = "";
 
-// -------------------------------
-// STEP 1 — ENTER NAME
-// -------------------------------
 startButton.addEventListener("click", () => {
     rawName = nameInput.value.trim().toLowerCase();
     playerName = rawName[0]+rawName[1] || ""; // first two letters
     if (!playerName) return;
 
-    // Hide the loading screen
     loadingScreen.style.display = "none";
-
-    // Show story screen
     storyScreen.style.display = "flex";
 
     let inGameName = "";
@@ -226,7 +213,7 @@ const easyModeButtons = document.getElementById("easyModeButtons");
 const finalResponse = document.getElementById("finalResponse");
 const continueGameBtn = document.getElementById("continueGameBtn");
 
-// Both YES and NO do the same thing (because residency)
+// Both answers lead to the easy-mode question
 function triggerEasyModeQuestion() {
     easyModeQuestion.style.display = "block";
 
@@ -238,7 +225,6 @@ function triggerEasyModeQuestion() {
 postCallYes.addEventListener("click", triggerEasyModeQuestion);
 postCallNo.addEventListener("click", triggerEasyModeQuestion);
 
-// Both "No" buttons
 document.querySelectorAll(".noBtn").forEach(btn => {
     btn.addEventListener("click", () => {
         easyModeButtons.style.display = "none";
@@ -251,7 +237,6 @@ document.querySelectorAll(".noBtn").forEach(btn => {
     });
 });
 
-// Actually start game
 continueGameBtn.addEventListener("click", () => {
     postCallScreen.style.display = "none";
     startGame();
@@ -278,22 +263,17 @@ if (receiptOverlay) {
         }
     });
 }
-// -------------------------------
-// STEP 2 — START GAME AFTER STORY
-// -------------------------------
+// Start game after the story is done ---------------------------
 beginGameBtn.addEventListener("click", () => {
     if (gameStarted) return;
 
-    // Hide story screen
     storyScreen.style.display = "none";
 
-    // Only certain people get interrogated
     if (postCallEligibleNames.includes(playerName)) {
         document.getElementById("postCallScreen").style.display = "flex";
         return;
     }
 
-    // Everyone else goes straight to game
     startGame();
 });
 
@@ -323,9 +303,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let rooms = buildRooms(canvas.width, canvas.height);
 
-// ---------------------------
-// GLOBAL STATE
-// ---------------------------
+// Global state --------------------------------------------------
 let currentRoomIndex = 0;
 let player;
 let platforms = [];
@@ -528,9 +506,7 @@ function handleResize() {
 
 window.addEventListener("resize", handleResize);
 
-// ---------------------------
-// INPUT
-// ---------------------------
+// Input handling ------------------------------------------------
 window.addEventListener("keydown", (e) => {
     keys[e.key] = true;
 });
@@ -539,7 +515,7 @@ window.addEventListener("keyup", (e) => {
 });
 
 window.addEventListener("keydown", (e) => {
-    // Ctrl + Shift + N → skip forward
+    // Dev skip forward shortcut
     if (e.key.toLowerCase() === "0") {
         devSkipForward();
     }
@@ -560,13 +536,11 @@ window.addEventListener("keydown", (e) => {
         );
     }
 });
-// ---------------------------
-// TEST MODE
-// ---------------------------
+// Dev/test helpers ----------------------------------------------
 function devSkipForward() {
     console.log("⏭ Dev skip forward");
 
-    // If still in intro screens → jump to game
+    // If still in intro screens, jump to the game
     if (loadingScreen.style.display !== "none") {
         loadingScreen.style.display = "none";
         storyScreen.style.display = "none";
@@ -577,21 +551,19 @@ function devSkipForward() {
         return;
     }
 
-    // If in game → next room
+    // If in game, skip to next room
     if (!gameEnded && currentRoomIndex + 1 < rooms.length) {
         loadRoom(currentRoomIndex + 1);
         return;
     }
 
-    // If last room → ending
+    // If last room, trigger ending
     if (!gameEnded) {
         endGame();
     }
 }
 
-// ---------------------------
-// COLLISION HELPER
-// ---------------------------
+// Collision helper ----------------------------------------------
 function isColliding(a, b) {
     const ax = a.x;
     const ay = a.y + (a.hitboxOffsetY || 0);
@@ -607,9 +579,7 @@ function isColliding(a, b) {
     );
 }
 
-// ---------------------------
-// LOAD A ROOM
-// ---------------------------
+// Load a room ---------------------------------------------------
 function loadRoom(index) {
     invertControls = false;
     currentRoomIndex = index;
@@ -624,10 +594,9 @@ function loadRoom(index) {
 
     let spritePath = "assets/player.png";
 
-    // player start
     player = new Player(room.playerStart.x, room.playerStart.y, spritePath);
 
-    // invert control
+    // Invert controls for the special player in room 2
     if (
         playerName === invertControlPlayer &&
         index === 1 &&
@@ -640,12 +609,10 @@ function loadRoom(index) {
 
     applyRoomLayout(room);
 
-    // clone enemies
     enemies = room.enemies.map(e => new Enemy(e.x, e.y));
 
     bullets = [];
 
-    // boss
     if (room.boss && room.boss.x !== undefined) {
         const tougherYiBoss = playerName === "yi";
         boss = new Boss(room.boss.x, room.boss.y, room.boss.maxY, tougherYiBoss);
@@ -654,21 +621,18 @@ function loadRoom(index) {
     }
 }
 
-// ---------------------------
-// ROOM EXIT CHECK
-// ---------------------------
+// Room exit check ----------------------------------------------
 function checkExit() {
     const room = rooms[currentRoomIndex];
     const door = room.exitDoor;
 
     if (!door) return;
 
-    // 🔒 Lock door if boss exists and is still alive
+    // Lock door if boss exists and is still alive
     if (room.boss && boss && boss.alive) {
         return;
     }
 
-    // Normal exit logic
     if (isColliding(player, door)) {
         if (currentRoomIndex + 1 < rooms.length) {
             loadRoom(currentRoomIndex + 1);
@@ -685,9 +649,7 @@ function drawLoadingScreen() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-// ---------------------------
-// EASTER EGG
-// ---------------------------
+// Cat easter egg ------------------------------------------------
 const catDialog = {
     1: "meow",
     2: "ok, thank you",
@@ -704,7 +666,7 @@ cat.addEventListener("click", () => {
 
     let message = catDialog[catClicks];
 
-    // SPECIAL CASE
+    // Special case for Yi
     if (playerName === "yi" && catClicks === 17) {
         message = "senpai";
     }
@@ -726,9 +688,7 @@ cat.addEventListener("click", () => {
     }, 120);
 });
 
-// ---------------------------
-// INVERSE CONTROL
-// ---------------------------
+// Inverse control overlay text ---------------------------------
 function triggerRespectText() {
     const lines = [
         "someone once said going easy is disrespectful.",
@@ -755,9 +715,7 @@ function triggerRespectText() {
     }, 1000); // 1 second delay
 }
 
-// ---------------------------
-// INVINCIBLE MODE ASSIST TEXT
-// ---------------------------
+// Invincible mode assist text ----------------------------------
 function showAssistText(text) {
     assistText = text;
     assistTextVisible = true;
@@ -768,14 +726,12 @@ function showAssistText(text) {
     }, 1800);
 }
 
-// ---------------------------
-// DEFEATED
-// ---------------------------
+// Defeat handling ----------------------------------------------
 const defeatTexts = [
     "oops.",
     "that was unfortunate.",
     "almost.",
-    "let’s pretend that didn’t happen.",
+    "let's pretend that didn't happen.",
     "interesting strategy.",
     "ambitious.",
     "that was bold.",
@@ -794,14 +750,11 @@ function handleDefeat() {
         text = defeatTexts[Math.floor(Math.random() * defeatTexts.length)];
     }
 
-    // Stop gameplay
     cancelAnimationFrame(gameLoopId);
 
-    // White screen
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Giant text
     ctx.fillStyle = "black";
     ctx.font = "bold 72px 'Playfair Display'";
     ctx.textAlign = "center";
@@ -811,7 +764,6 @@ function handleDefeat() {
         canvas.height / 2
     );
 
-    // Pause, then restart room
     setTimeout(() => {
         restartRoom();
     }, 1200);
@@ -820,16 +772,11 @@ function handleDefeat() {
 function restartRoom() {
     defeatInProgress = false;
 
-    // Reload same room
     loadRoom(currentRoomIndex);
-
-    // Resume loop
     gameLoop();
 }
 
-// ---------------------------
-// GAME LOOP
-// ---------------------------
+// Game loop -----------------------------------------------------
 function gameLoop() {
     if (gameEnded) return;
     if (player && player.hp === 0 && !defeatInProgress) {
@@ -837,7 +784,6 @@ function gameLoop() {
         return;
     }
 
-    // MOVEMENT
     const leftKey = invertControls ? "ArrowRight" : "ArrowLeft";
     const rightKey = invertControls ? "ArrowLeft" : "ArrowRight";
 
@@ -859,49 +805,41 @@ function gameLoop() {
         if (now - lastShotTime > SHOT_COOLDOWN) {
             lastShotTime = now;
 
-            // Pick bullet image based on player name
-            let skin = bulletSkins[playerName] || bulletSkins["default"];
+            // Use name-based bullet skin
+            let skin = bulletSkins[playerName] || bulletSkins.default;
 
             bullets.push(new Bullet(
                 player.x + player.width / 2 + (player.facing === 1 ? player.shootOffsetX : -player.shootOffsetX),
                 player.y + player.shootOffsetY,
                 player.facing,
-                skin            // <-- NEW
+                skin
             ));
         }
     }
-    // UPDATE PLAYER PHYSICS
     player.update(platforms);
 
-    // Instant breakable platforms
+    // Crumble platforms disappear on contact and trigger trap once
     for (let c of crumblePlatforms) {
         if (isColliding(player, c)) {
 
-            // REMOVE crumble platform
             crumblePlatforms = crumblePlatforms.filter(cp => cp !== c);
             platforms = platforms.filter(p => !(p.x === c.x && p.y === c.y));
 
-            // TRIGGER MESSAGE ONLY ONCE
             if (!trapTriggered) {
                 trapTriggered = true;
 
-                // Show message 1 sec later
                 setTimeout(() => {
                     showTrapMessage = true;
                     toggleTrapOverlay(true);
 
-                    // Hide message after 2 sec
                     setTimeout(() => {
                         showTrapMessage = false;
                         toggleTrapOverlay(false);
                     }, 2000);
 
-                }, 1000); // 1 sec delay
+                }, 1000);
 
-
-
-                // ⭐ TELEPORT TO ROOM 2
-                // After 2.5 seconds (fall + message timing)
+                // Teleport to the next room after the trap resolves
                 setTimeout(() => {
                     loadRoom(1);
                 }, 4000);
@@ -911,33 +849,33 @@ function gameLoop() {
         }
     }
 
-    // UPDATE ENEMIES
     enemies.forEach(e => {
         if (!e.isDead) e.update(player, platforms);
     });
 
-    // Update Boss
+    // Boss AI update
     if (boss && boss.alive) {
         boss.update(
             player,
             platforms,
 
-            // spawnEnemyCallback
+            // Spawn minions during the fight
             (x, y) => {
                 enemies.push(new Enemy(x, y - 50));
             },
 
-            // shootCallback
+            // Boss projectile callback
             (x, y, direction) => {
-                snowballs.push(new Snowball(x, y, direction));
+                const speedBoost = playerName === "yi" ? 1.25 : 1;
+                snowballs.push(new Snowball(x, y, direction, speedBoost));
             }
         );
     }
-    // UPDATE BULLETS
+    
     bullets.forEach(b => b.update());
     bullets = bullets.filter(b => !b.isOffScreen(canvas.width));
 
-    // BULLET → ENEMY DAMAGE
+    // Bullet vs enemy damage
     for (let i = bullets.length - 1; i >= 0; i--) {
         for (let j = enemies.length - 1; j >= 0; j--) {
             if (!enemies[j].isDead && isColliding(bullets[i], enemies[j])) {  
@@ -949,7 +887,7 @@ function gameLoop() {
         }
     }
 
-    // BULLET → BOSS DAMAGE
+    // Bullet vs boss damage
     if (boss && boss.alive) {
         for (let i = bullets.length - 1; i >= 0; i--) {
             if (isColliding(bullets[i], boss)) {
@@ -959,19 +897,17 @@ function gameLoop() {
         }
     }
 
-    // ENEMY → PLAYER DAMAGE
+    // Enemy vs player damage
     for (let e of enemies) {
         if (!e.isDead && isColliding(player, e)) {
             player.takeDamage(e);
         }
     }
 
-    // BOSS -> PLAYER DAMAGE
     if (boss && boss.alive && isColliding(player, boss)) {
         player.takeDamage(boss);
     }
 
-    // SNOWBALL -> PLAYER DAMAGE
     snowballs.forEach(sb => sb.update());
     snowballs = snowballs.filter(sb => !sb.isOffScreen(canvas.width));
 
@@ -981,14 +917,11 @@ function gameLoop() {
         }
     }
 
-    // UPDATE GIFTS (fade + bob)
     gifts.forEach(g => g.update());
 
-    // PLAYER COLLECTS GIFT
     for (let i = gifts.length - 1; i >= 0; i--) {
         const g = gifts[i];
 
-        // if collected
         if (g.collidesWith(player)) {
             giftCount++;
             g.collected = true;
@@ -996,43 +929,39 @@ function gameLoop() {
             continue;
         }
 
-        // if faded away
         if (g.isGone()) {
             gifts.splice(i, 1);
         }
     }
 
-    // CHECK ROOM EXIT
     checkExit();
 
 
-    // ---------------------------
-    // DRAW
-    // ---------------------------
+    // Draw -------------------------------------------------------
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw platforms
     platforms.forEach(p => {
-         if (p.invisible) return;
-         
-         const tileW = 64;  // ← width of your ice tile
-        const tileH = 32;  // ← height of your tile image
+        if (p.invisible) return;
+
+        const tileW = 64;
+        const tileH = 32;
 
         for (let x = 0; x < p.width; x += tileW) {
             ctx.drawImage(iceTile, p.x + x, p.y, tileW, tileH);
         }
     });
 
-    // Draw crumble platforms (look identical)
+    // Draw crumble platforms
     crumblePlatforms.forEach(c => {
-        const tileW = 64;  // ← width of your ice tile
-        const tileH = 32;  // ← height of your tile image
+        const tileW = 64;
+        const tileH = 32;
         for (let x = 0; x < c.width; x += tileW) {
             ctx.drawImage(iceTile, c.x + x, c.y, tileW, tileH);
         }
     });
 
-    // Draw exit door (image)
+    // Draw exit door
     const door = rooms[currentRoomIndex].exitDoor;
 
     if (doorLoaded) {
@@ -1042,7 +971,7 @@ function gameLoop() {
         ctx.fillRect(door.x, door.y, door.width, door.height);
     }
 
-    // Inivincible assist text
+    // Assist mode text
     if (assistTextVisible && assistText) {
         ctx.fillStyle = "black";
         ctx.font = "28px 'Playfair Display'";
@@ -1054,18 +983,14 @@ function gameLoop() {
         );
     }
 
-    // Gifts
     gifts.forEach(g => g.draw(ctx));
 
-    // Player
     player.draw(ctx);
 
-    // HP
     ctx.fillStyle = "black";
     ctx.font = "30px 'Playfair Display'";
     ctx.fillText(`❤️ HP: ${player.hp}`, 40, 50);
 
-    // Gifts Collected
     ctx.fillStyle = "black";
     ctx.font = "30px 'Playfair Display'";
     ctx.fillText(`🎁 Gifts: ${giftCount}`, 40, 90);
@@ -1085,21 +1010,17 @@ function gameLoop() {
         ctx.strokeRect(canvas.width / 2 - barWidth / 2, 40, barWidth, 20);
     }
 
-    //  Boss
     if (boss && boss.alive) {
         boss.draw(ctx);
     }
     
-    // Enemies
     enemies.forEach(e => {
         if (!e.isDead) e.draw(ctx);
     });
 
 
-    // Bullets
     bullets.forEach(b => b.draw(ctx));
 
-    // Snowball
     snowballs.forEach(sb => sb.draw(ctx));
 
     gameLoopId = requestAnimationFrame(gameLoop);
@@ -1108,7 +1029,6 @@ function gameLoop() {
 function endGame() {
     gameEnded = true;
 
-    // Stop rendering logic
     cancelAnimationFrame(gameLoopId);
 
     // Swap to ending music
@@ -1116,7 +1036,6 @@ function endGame() {
     endgameMusic.currentTime = 0;
     endgameMusic.play().catch(() => {});
 
-    // Hide canvas
     gameCanvas.style.display = "none";
 
     // Show ending screen
@@ -1125,18 +1044,3 @@ function endGame() {
     if (openReceiptBtn) openReceiptBtn.style.display = "inline-flex";
 
 }
-
-// ---------------------------
-// START GAME
-// ---------------------------
-// DO NOT start game until name is entered
-//drawLoadingScreen();
-
-// Skip loading + story screens → start game instantly
-//storyScreen.style.display = "none";
-//loadingScreen.style.display = "none";
-//gameCanvas.style.display = "block";
-
-
-//loadRoom(0);
-//gameLoop();

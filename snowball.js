@@ -1,11 +1,11 @@
 export default class Snowball {
-    constructor(x, y, direction) {
+    constructor(x, y, direction, speedMultiplier = 1) {
         this.x = x;
         this.y = y;
         this.width = 40;
         this.height = 40;
 
-        this.speed = 6 * direction;
+        this.speed = 6 * direction * speedMultiplier;
 
         this.image = new Image();
         this.image.src = "assets/snowball.png";
