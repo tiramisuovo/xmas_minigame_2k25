@@ -1,5 +1,5 @@
 export default class Player {
-    constructor(x, y, sprite) {
+    constructor(x, y, sprite, maxHP = 5) {
         this.x = x;
         this.y = y;
         this.width = 100;
@@ -24,8 +24,8 @@ export default class Player {
         this.shootOffsetX = 50;
         this.shootOffsetY = 20;  // move bullet downward
 
-        this.maxHP = 5;
-        this.hp = 5;
+        this.maxHP = maxHP;
+        this.hp = maxHP;
         this.isInvincible = false;
         this.invincibilityDuration = 1500; // ms
         this.knockback = 10;

@@ -710,7 +710,12 @@ function loadRoom(index) {
     }
     toggleIntroOverlay(index === 0);
 
-    player = new Player(room.playerStart.x, room.playerStart.y, assets.playerSprite);
+    player = new Player(
+        room.playerStart.x,
+        room.playerStart.y,
+        assets.playerSprite,
+        playerName === "yi" ? 3 : 5
+    );
 
     player.vy = 0;
 
