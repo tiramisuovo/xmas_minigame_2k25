@@ -1,5 +1,5 @@
 export default class Gift {
-    constructor(x, y) {
+    constructor(x, y, sprite = null) {
         this.x = x;
         this.y = y;
 
@@ -12,8 +12,12 @@ export default class Gift {
 
         this.collected = false;
 
+        if (sprite instanceof HTMLImageElement) {
+        this.img = sprite;
+        } else {
         this.img = new Image();
-        this.img.src = "assets/gift.png";   // your cute gift sprite
+        this.img.src = "assets/gift.png";
+        }
     }
 
     update() {

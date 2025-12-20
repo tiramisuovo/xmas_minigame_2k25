@@ -1,5 +1,5 @@
 export default class Enemy {
-    constructor(x, y){
+    constructor(x, y, sprite){
         this.x = x;
         this.y = y;
         this.width = 100;
@@ -13,8 +13,12 @@ export default class Enemy {
         this.jumpStrength = -15;
         this.canJump = false;     // set true when landing
     
-        this.image = new Image();
-        this.image.src = "assets/snowman.png";
+        if (sprite instanceof HTMLImageElement) {
+            this.image = sprite;
+        } else {
+            this.image = new Image();
+            this.image.src = typeof sprite === "string" && sprite ? sprite : "assets/snowman.png";
+        }
         this.facing = 1;  
         this.scale = 1; 
         this.drawScale = 1;

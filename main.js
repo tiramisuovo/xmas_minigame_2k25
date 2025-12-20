@@ -8,6 +8,19 @@ import Snowball from "./snowball.js";
 import { initSnow, resizeSnow } from "./snow.js";
 import { setupAudio } from "./audio.js";
 
+function warmUpEmojis() {
+  const warm = document.createElement("span");
+  warm.textContent = "🍅🍰🧠🧡🧋✨🎮🔬🎵📚🐋❤️🎁";
+  warm.style.position = "absolute";
+  warm.style.left = "-9999px";
+  warm.style.top = "-9999px";
+  warm.style.fontSize = "32px";
+  warm.style.fontFamily = "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
+  document.body.appendChild(warm);
+}
+warmUpEmojis();
+
+
 // Typewriter effect helper -------------------------------------
 function typeWriter(element, text, speed = 40) {
     element.innerText = "";
@@ -45,28 +58,40 @@ function loadImage(src) {
 
 const assets = {};
 const assetsReady = (async () => {
-  const [
-    groundTile,
-    door,
-    playerSprite,
-    snowflake,
-    tomato
-  ] = await Promise.all([
-    loadImage("assets/ground_tile.png"),
-    loadImage("assets/door.png"),
-    loadImage("assets/player.png"),
-    loadImage("assets/snowflake.png"),
-    loadImage("assets/tomato.png"),
-  ]);
+    const [
+        groundTile,
+        door,
+        playerSprite,
+        snowflake,
+        tomato,
+        snowman,
+        bossSprite,
+        giftSprite,
+        snowballSprite,
+    ] = await Promise.all([
+        loadImage("assets/ground_tile.png"),
+        loadImage("assets/door.png"),
+        loadImage("assets/player.png"),
+        loadImage("assets/snowflake.png"),
+        loadImage("assets/tomato.png"),
+        loadImage("assets/snowman.png"),
+        loadImage("assets/boss_golem.png"),      // <- use your real file
+        loadImage("assets/gift.png"),      // <- use your real file
+        loadImage("assets/snowball.png"),  // <- use your real file
+    ]);
 
-  assets.iceTile = groundTile;
-  assets.doorImg = door;
-  assets.playerSprite = playerSprite;
-  assets.bulletSnowflake = snowflake;
-  assets.bulletTomato = tomato;
+    assets.iceTile = groundTile;
+    assets.doorImg = door;
+    assets.playerSprite = playerSprite;
+    assets.bulletSnowflake = snowflake;
+    assets.bulletTomato = tomato;
+    assets.enemySprite = snowman;
+    assets.bossSprite = bossSprite;
+    assets.giftSprite = giftSprite;
+    assets.snowballSprite = snowballSprite;
 
-  return assets;
-})();
+    return assets;
+    })();
 
 // Startup flow + name system ------------------------------------
 const loadingScreen = document.getElementById("loadingScreen");
@@ -102,7 +127,9 @@ startButton.addEventListener("click", async () => {
     startButton.disabled = true;
 
     try {
-        await assetsReady; // wait until images are decoded and ready
+        const a = await assetsReady;
+        iceTile = a.iceTile;
+        doorImg = a.doorImg;
     } catch (e) {
         console.error(e);
         // You can show an error message on loadingScreen here if you want
@@ -316,21 +343,8 @@ let gameEnded = false;
 let gameLoopId;
 let defeatInProgress = false;
 
-const iceTile = new Image();
-iceTile.src = "assets/ground_tile.png"; 
-const doorImg = new Image();
-doorImg.src = "assets/door.png";
-
-let doorLoaded = false;
-
-doorImg.onload = () => {
-    doorLoaded = true;
-    console.log("Door image loaded!");
-};
-
-doorImg.onerror = () => {
-    console.error("Failed to load door.png — check path!");
-};
+let iceTile;
+let doorImg;
 
 let gifts = [];
 let giftCount = 0;
@@ -640,14 +654,18 @@ window.addEventListener("keydown", (e) => {
 function devSkipForward() {
     console.log("⏭ Dev skip forward");
 
-    // If still in intro screens, jump to the game
     if (loadingScreen.style.display !== "none") {
+        assetsReady.then((a) => {
+        iceTile = a.iceTile;
+        doorImg = a.doorImg;
+
         loadingScreen.style.display = "none";
         storyScreen.style.display = "none";
         gameCanvas.style.display = "block";
 
         loadRoom(0);
         gameLoop();
+        });
         return;
     }
 
@@ -692,9 +710,8 @@ function loadRoom(index) {
     }
     toggleIntroOverlay(index === 0);
 
-    let spritePath = "assets/player.png";
+    player = new Player(room.playerStart.x, room.playerStart.y, assets.playerSprite);
 
-    player = new Player(room.playerStart.x, room.playerStart.y, spritePath);
     player.vy = 0;
 
     // Invert controls for the special player in room 2
@@ -710,7 +727,7 @@ function loadRoom(index) {
 
     applyRoomLayout(room);
 
-    enemies = room.enemies.map(e => new Enemy(e.x, e.y));
+    enemies = room.enemies.map(e => new Enemy(e.x, e.y, assets.enemySprite));
 
     bullets = [];
 
@@ -1094,13 +1111,8 @@ function gameLoop() {
     const drawX = door.x;
     const drawY = door.y - spriteOffsetY;
 
-    if (doorLoaded) {
+
     ctx.drawImage(doorImg, drawX, drawY, drawW, drawH);
-    } else {
-    // optional: make fallback match the sprite footprint (so it does not “jump” when loaded)
-    ctx.fillStyle = "gold";
-    ctx.fillRect(drawX, drawY, drawW, drawH);
-    }
 
     // Assist mode text
     if (assistTextVisible && assistText) {

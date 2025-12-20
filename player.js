@@ -1,5 +1,5 @@
 export default class Player {
-    constructor(x, y, spritePath){
+    constructor(x, y, sprite) {
         this.x = x;
         this.y = y;
         this.width = 100;
@@ -14,11 +14,15 @@ export default class Player {
         this.canJump = true
         this.facing = 1; // 1 for right, -1 for left
 
-        this.image = new Image();
-        this.image.src = spritePath;
+        if (sprite instanceof HTMLImageElement) {
+            this.image = sprite;
+        } else {
+            this.image = new Image();
+            this.image.src = typeof sprite === "string" && sprite ? sprite : "assets/player.png";
+        }
 
         this.shootOffsetX = 50;
-        this.shootOffsetY =  20;  // move bullet downward
+        this.shootOffsetY = 20;  // move bullet downward
 
         this.maxHP = 5;
         this.hp = 5;
@@ -26,7 +30,7 @@ export default class Player {
         this.invincibilityDuration = 1500; // ms
         this.knockback = 10;
         this.coyoteTimer = 0;
-        this.coyoteTimeMax = 180; // ms (use 300–420 for assist later)
+        this.coyoteTimeMax = 180; // ms (use 300-420 for assist later)
     }
 
     applyScale(scaleX, scaleY) {
@@ -50,22 +54,22 @@ export default class Player {
         this.scale = 1; // hitbox already scaled
     }
 
-    moveLeft(){
+    moveLeft() {
         this.vx = -this.speed
         this.facing = -1;
     }
 
-    moveRight(){
+    moveRight() {
         this.vx = this.speed
         this.facing = 1;
     }
 
-    stop(){
+    stop() {
         this.vx = 0
     }
 
-    jump(){
-        if (this.canJump || this.coyoteTimer > 0){
+    jump() {
+        if (this.canJump || this.coyoteTimer > 0) {
             this.vy = this.jumpStrength;
             this.canJump = false;
             this.coyoteTimer = 0;
@@ -84,28 +88,29 @@ export default class Player {
 
         // FLOOR LANDING CHECK
         for (let p of platforms) {
-        const withinX =
-            this.x + this.width > p.x &&
-            this.x < p.x + p.width;
+            const withinX =
+                this.x + this.width > p.x &&
+                this.x < p.x + p.width;
 
-        const bottomNow  = this.y + this.height;
-        const bottomNext = nextY + this.height;
+            const bottomNow = this.y + this.height;
+            const bottomNext = nextY + this.height;
 
-        const tolerance = 10; // 👈 key: allow a little penetration
+            const tolerance = 10; // key: allow a little penetration
 
-        if (
-            this.vy >= 0 &&
-            withinX &&
-            bottomNow <= p.y + tolerance &&
-            bottomNext >= p.y
-        ) {
-            nextY = p.y - this.height;
-            this.vy = 0;
-            this.canJump = true;
-            onPlatform = true;
-            break;
+            if (
+                this.vy >= 0 &&
+                withinX &&
+                bottomNow <= p.y + tolerance &&
+                bottomNext >= p.y
+            ) {
+                nextY = p.y - this.height;
+                this.vy = 0;
+                this.canJump = true;
+                onPlatform = true;
+                break;
+            }
         }
-        }
+
         // CEILING COLLISION (hit underside of platform)
         for (let p of platforms) {
             const withinX =
@@ -168,8 +173,8 @@ export default class Player {
         // Update coyote timer
         if (this.isInvincible) {
             this.coyoteTimeMax = 500;
-            }
-        
+        }
+
         if (this.canJump) {
             this.coyoteTimer = this.coyoteTimeMax;
         } else {
@@ -179,7 +184,7 @@ export default class Player {
 
     takeDamage(fromEnemy) {
         if (window.invincibleMode) return; // cannot take damage during i-frames
-        if (this.isInvincible) return;     // <- skip during i-frames
+        if (this.isInvincible) return;     // skip during i-frames
         if (this.hp <= 0) return;
 
         this.hp -= 1;
@@ -202,9 +207,7 @@ export default class Player {
         setTimeout(() => {
             this.isInvincible = false;
         }, this.invincibilityDuration);
-
     }
-
 
     draw(ctx) {
         if (!this.image.complete) {
@@ -217,18 +220,19 @@ export default class Player {
         const drawHeight = this.height * this.scale;
 
         // Lower the sprite slightly to match the ground
-        const footOffset = 0;     // <-- adjust this number until the feet look perfect
+        const footOffset = 0;     // adjust this number until the feet look perfect
         const offsetX = (drawWidth - this.width) / 2;
         const offsetY = (drawHeight - this.height) - footOffset;
 
         ctx.save();
 
-
         if (this.isInvincible) {
             if (Math.floor(Date.now() / 100) % 2 === 0) {
-                return; // skip drawing → blinking effect
+                ctx.restore();
+                return; // blinking effect
             }
         }
+
         if (this.facing === -1) {
             ctx.scale(-1, 1);
             ctx.drawImage(
@@ -250,5 +254,4 @@ export default class Player {
 
         ctx.restore();
     }
-        
 }

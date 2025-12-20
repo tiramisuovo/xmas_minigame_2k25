@@ -1,5 +1,5 @@
 export default class Boss {
-    constructor(x, y, maxY = Infinity, isYi = false) {
+    constructor(x, y, maxY = Infinity, isYi = false, sprite = null) {
         this.x = x;
         this.y = y;
 
@@ -23,8 +23,12 @@ export default class Boss {
         this.jumpStrength = this.baseJumpStrength;
         this.canJump = true;
 
+        if (sprite instanceof HTMLImageElement) {
+        this.image = sprite;
+        } else {
         this.image = new Image();
-        this.image.src = "assets/boss_golem.png";
+        this.image.src = "assets/boss_golem.png"; // fallback for safety
+        }
 
         this.facing = 1;
 
