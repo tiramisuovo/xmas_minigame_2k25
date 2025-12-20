@@ -498,6 +498,17 @@ function placeEntityOnPlatform(entity, platform) {
     entity.y = platform.y - entity.height;
 }
 
+function keepPlayerGrounded() {
+    if (!player) return;
+    const feet = player.y + player.height;
+    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
+    if (support && player.y > support.y - player.height) {
+        placeEntityOnPlatform(player, support);
+        player.vy = 0;
+        player.canJump = true;
+    }
+}
+
 function scaleActiveEntities(scaleX, scaleY) {
     if (player) {
         player.x *= scaleX;
