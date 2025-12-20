@@ -495,6 +495,20 @@ function placeEntityOnPlatform(entity, platform) {
     entity.y = platform.y - entity.height;
 }
 
+function keepPlayerGrounded() {
+    if (!player) return;
+    const feet = player.y + player.height;
+    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
+    if (support) {
+        const targetY = support.y - player.height;
+        if (player.y > targetY) {
+            placeEntityOnPlatform(player, support);
+            player.vy = 0;
+            player.canJump = true;
+        }
+    }
+}
+
 function scaleActiveEntities(scaleX, scaleY) {
     if (player) {
         player.x *= scaleX;
@@ -871,6 +885,7 @@ function gameLoop() {
         }
     }
     player.update(platforms);
+    keepPlayerGrounded();
 
     // Crumble platforms disappear on contact and trigger trap once
     for (let c of crumblePlatforms) {
