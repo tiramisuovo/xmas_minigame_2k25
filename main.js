@@ -5,52 +5,8 @@ import { buildRooms } from "./rooms.js";
 import Gift from "./gift.js";
 import Boss from "./boss.js";
 import Snowball from "./snowball.js";
-
-// Snow overlay -------------------------------------------------
-const snowCanvas = document.getElementById("snowCanvas");
-const snowCtx = snowCanvas.getContext("2d");
-
-snowCanvas.width = window.innerWidth;
-snowCanvas.height = window.innerHeight;
-
-let snowflakes = [];
-
-function createSnowflakes(count = 120) {
-    snowflakes = [];
-    for (let i = 0; i < count; i++) {
-        snowflakes.push({
-            x: Math.random() * snowCanvas.width,
-            y: Math.random() * snowCanvas.height,
-            radius: Math.random() * 3 + 1,
-            speed: Math.random() * 1 + 0.5,
-            drift: (Math.random() - 0.5) * 0.5
-        });
-    }
-}
-
-function updateSnow() {
-    snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
-
-    snowflakes.forEach(flake => {
-        flake.y += flake.speed;
-        flake.x += flake.drift;
-
-        if (flake.y > snowCanvas.height) {
-            flake.y = -10;
-            flake.x = Math.random() * snowCanvas.width;
-        }
-
-        snowCtx.beginPath();
-        snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-        snowCtx.fillStyle = "white";
-        snowCtx.fill();
-    });
-
-    requestAnimationFrame(updateSnow);
-}
-
-createSnowflakes();
-updateSnow();
+import { initSnow, resizeSnow } from "./snow.js";
+import { setupAudio } from "./audio.js";
 
 // Typewriter effect helper -------------------------------------
 function typeWriter(element, text, speed = 40) {
@@ -73,18 +29,7 @@ function typeWriter(element, text, speed = 40) {
 const bgm = document.getElementById("bgm");
 const endgameMusic = document.getElementById("endgameMusic");
 const muteBtn = document.getElementById("muteBtn");
-
-// Start music after user interaction (browser rule)
-window.addEventListener("click", () => {
-    if (bgm.paused) bgm.play();
-    endgameMusic.muted = bgm.muted;
-}, { once: true });
-
-muteBtn.addEventListener("click", () => {
-    bgm.muted = !bgm.muted;
-    endgameMusic.muted = bgm.muted;
-    muteBtn.textContent = bgm.muted ? "🔇" : "🔊";
-});
+const audioControls = setupAudio({ bgm, endgameMusic, muteBtn });
 
 
 // Startup flow + name system ------------------------------------
@@ -297,6 +242,9 @@ function startGame() {
     gameLoop();
 }
 
+const snowCanvas = document.getElementById("snowCanvas");
+initSnow(snowCanvas);
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -450,6 +398,26 @@ function applyRoomLayout(room) {
     );
 }
 
+function snapPlayerToPlatform() {
+    if (!player || !platforms.length) return;
+
+    const candidates = platforms.filter(p =>
+        !p.invisible &&
+        player.x + player.width > p.x &&
+        player.x < p.x + p.width &&
+        p.y >= player.y
+    );
+
+    if (!candidates.length) return;
+
+    const landing = candidates.reduce((lowest, current) =>
+        current.y < lowest.y ? current : lowest
+    );
+
+    player.y = landing.y - player.height;
+    player.vy = 0;
+}
+
 function scaleActiveEntities(scaleX, scaleY) {
     if (player) {
         player.x *= scaleX;
@@ -486,8 +454,7 @@ function handleResize() {
     const prevWidth = canvas.width;
     const prevHeight = canvas.height;
 
-    snowCanvas.width = window.innerWidth;
-    snowCanvas.height = window.innerHeight;
+    resizeSnow(window.innerWidth, window.innerHeight);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -499,9 +466,9 @@ function handleResize() {
     if (gameStarted && !gameEnded) {
         scaleActiveEntities(scaleX, scaleY);
         applyRoomLayout(rooms[currentRoomIndex]);
+        snapPlayerToPlatform();
     }
 
-    createSnowflakes();
 }
 
 window.addEventListener("resize", handleResize);
@@ -608,6 +575,7 @@ function loadRoom(index) {
     }
 
     applyRoomLayout(room);
+    snapPlayerToPlatform();
 
     enemies = room.enemies.map(e => new Enemy(e.x, e.y));
 
