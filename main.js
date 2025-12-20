@@ -425,7 +425,7 @@ function snapPlayerToPlatform() {
     const support = getSupportPlatform(player.x + player.width / 2);
     if (!support) return;
 
-    player.y = support.y - player.height;
+    placeEntityOnPlatform(player, support);
     player.vy = 0;
     player.canJump = true;
 }
@@ -456,7 +456,7 @@ function snapEnemiesToPlatforms() {
         const feet = e.y + e.height;
         const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
         if (support) {
-            e.y = support.y - e.height;
+            placeEntityOnPlatform(e, support);
             e.vy = 0;
         }
     });
@@ -469,7 +469,7 @@ function keepEnemiesGrounded() {
         if (support) {
             const targetY = support.y - e.height;
             if (e.y > targetY) {
-                e.y = targetY;
+                placeEntityOnPlatform(e, support);
                 e.vy = 0;
             }
         }
@@ -485,6 +485,14 @@ function alignDoorToGround() {
     if (support) {
         door.y = support.y - door.height;
     }
+}
+
+function placeEntityOnPlatform(entity, platform) {
+    entity.x = Math.min(
+        Math.max(entity.x, platform.x),
+        platform.x + platform.width - entity.width
+    );
+    entity.y = platform.y - entity.height;
 }
 
 function scaleActiveEntities(scaleX, scaleY) {
