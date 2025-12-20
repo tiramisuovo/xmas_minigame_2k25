@@ -431,7 +431,6 @@ function snapPlayerToPlatform() {
 
     player.y = support.y - player.height;
     player.vy = 0;
-    player.vy = 0;
     player.canJump = true;
 }
 
