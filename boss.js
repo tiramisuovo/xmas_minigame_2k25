@@ -3,8 +3,10 @@ export default class Boss {
         this.x = x;
         this.y = y;
 
-        this.width = 180;
-        this.height = 180;
+        this.baseWidth = 180;
+        this.baseHeight = 180;
+        this.width = this.baseWidth;
+        this.height = this.baseHeight;
         this.maxY = maxY
 
         this.maxHP = isYi ? 10 : 6;
@@ -12,10 +14,13 @@ export default class Boss {
 
         this.vx = 0;
         this.vy = 0;
-        this.speed = isYi ? 2.4 : 1.5;
-        this.gravity = 0.6;
+        this.baseSpeed = isYi ? 2.4 : 1.5;
+        this.speed = this.baseSpeed;
+        this.baseGravity = 0.6;
+        this.gravity = this.baseGravity;
 
-        this.jumpStrength = -18;
+        this.baseJumpStrength = -18;
+        this.jumpStrength = this.baseJumpStrength;
         this.canJump = true;
 
         this.image = new Image();
@@ -32,6 +37,14 @@ export default class Boss {
         this.lastSummon = 0;
 
         this.alive = true;
+    }
+
+    applyScale(scale) {
+        this.width = this.baseWidth * scale;
+        this.height = this.baseHeight * scale;
+        this.speed = this.baseSpeed * scale;
+        this.gravity = this.baseGravity * scale;
+        this.jumpStrength = this.baseJumpStrength * scale;
     }
 
     update(player, platforms, spawnEnemyCallback, shootCallback) {

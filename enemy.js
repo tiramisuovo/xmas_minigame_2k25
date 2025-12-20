@@ -20,6 +20,24 @@ export default class Enemy {
         this.drawScale = 1;
     }
 
+    applyScale(scale) {
+        const baseWidth = 100;
+        const baseHeight = 100;
+        const baseSpeed = 1.95;
+        const baseJumpSpeed = 4;
+        const baseGravity = 0.6;
+        const baseJumpStrength = -15;
+
+        this.width = baseWidth * scale;
+        this.height = baseHeight * scale;
+        this.speed = baseSpeed * scale;
+        this.jumpSpeed = baseJumpSpeed * scale;
+        this.gravity = baseGravity * scale;
+        this.jumpStrength = baseJumpStrength * scale;
+        this.scale = 1;
+        this.drawScale = 1;
+    }
+
     _maxJumpHeight() {
         // h = v^2 / (2g); jumpStrength is negative so square it
         return (this.jumpStrength * this.jumpStrength) / (2 * this.gravity);

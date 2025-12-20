@@ -386,6 +386,27 @@ function setIntroTextForPlayer() {
     }
 }
 
+const BASE_WIDTH = 1920;
+const BASE_HEIGHT = 1080;
+
+function getEntityScale() {
+    return Math.min(canvas.width / BASE_WIDTH, canvas.height / BASE_HEIGHT);
+}
+
+function applyEntityScale(scale) {
+    if (player && typeof player.applyScale === "function") {
+        player.applyScale(scale);
+    }
+    enemies.forEach(e => {
+        if (typeof e.applyScale === "function") {
+            e.applyScale(scale);
+        }
+    });
+    if (boss && typeof boss.applyScale === "function") {
+        boss.applyScale(scale);
+    }
+}
+
 function applyRoomLayout(room) {
     platforms = room.platforms.map(p => ({ ...p }));
     crumblePlatforms = room.crumblePlatforms
@@ -401,7 +422,8 @@ function applyRoomLayout(room) {
 function snapPlayerToPlatform() {
     if (!player || !platforms.length) return;
 
-    const support = getSupportPlatform(player.x + player.width / 2);
+    const feet = player.y + player.height;
+    const support = getSupportPlatform(player.x + player.width / 2, feet - 5);
     if (!support) return;
 
     player.y = support.y - player.height;
@@ -431,7 +453,8 @@ function getSupportPlatform(centerX, minY = -Infinity) {
 
 function snapEnemiesToPlatforms() {
     enemies.forEach(e => {
-        const support = getSupportPlatform(e.x + e.width / 2, e.y);
+        const feet = e.y + e.height;
+        const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
         if (support) {
             e.y = support.y - e.height;
             e.vy = 0;
@@ -441,7 +464,8 @@ function snapEnemiesToPlatforms() {
 
 function keepEnemiesGrounded() {
     enemies.forEach(e => {
-        const support = getSupportPlatform(e.x + e.width / 2, e.y);
+        const feet = e.y + e.height;
+        const support = getSupportPlatform(e.x + e.width / 2, feet - 5);
         if (support) {
             const targetY = support.y - e.height;
             if (e.y > targetY) {
@@ -511,6 +535,7 @@ function handleResize() {
     if (gameStarted && !gameEnded) {
         scaleActiveEntities(scaleX, scaleY);
         applyRoomLayout(rooms[currentRoomIndex]);
+        applyEntityScale(getEntityScale());
         snapPlayerToPlatform();
         snapEnemiesToPlatforms();
         alignDoorToGround();
@@ -610,7 +635,6 @@ function loadRoom(index) {
 
     player = new Player(room.playerStart.x, room.playerStart.y, spritePath);
     player.vy = 0;
-    player.x = Math.min(Math.max(player.x, 0), canvas.width - player.width);
 
     // Invert controls for the special player in room 2
     if (
@@ -624,9 +648,6 @@ function loadRoom(index) {
     }
 
     applyRoomLayout(room);
-    snapPlayerToPlatform();
-    snapEnemiesToPlatforms();
-    alignDoorToGround();
 
     enemies = room.enemies.map(e => new Enemy(e.x, e.y));
 
@@ -638,6 +659,12 @@ function loadRoom(index) {
     } else {
         boss = null;
     }
+
+    applyEntityScale(getEntityScale());
+    player.x = Math.min(Math.max(player.x, 0), canvas.width - player.width);
+    snapPlayerToPlatform();
+    snapEnemiesToPlatforms();
+    alignDoorToGround();
 }
 
 // Room exit check ----------------------------------------------
@@ -880,7 +907,11 @@ function gameLoop() {
 
             // Spawn minions during the fight
             (x, y) => {
-                enemies.push(new Enemy(x, y - 50));
+                const minion = new Enemy(x, y - 50);
+                if (typeof minion.applyScale === "function") {
+                    minion.applyScale(getEntityScale());
+                }
+                enemies.push(minion);
             },
 
             // Boss projectile callback
